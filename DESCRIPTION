@@ -1,12 +1,15 @@
 Package: DRtool
-Title: What the Package Does (One Line, Title Case)
+Title: Dimension Reduction Assessment Tool
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Authors@R: c(
+    person("Justin", "Lin", , "linjus@iu.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0007-7190-2430"),
+    person("Julia", "Fukuyama", , "jfukuyam@iu.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7590-5563"))
+Description: A tool for assessing and visualizing dimension reduction performance.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports:
+    igraph
