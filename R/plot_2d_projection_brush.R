@@ -1,4 +1,4 @@
-plot_2d_projection_brush <- function(Z, path, g1, g2, cluster, id, slider) {
+plot_2d_projection_brush <- function(Z, path, g1, g2, cluster, id, slider, adjust) {
   # convert cluster to standard form
   cluster <- as.integer(as.factor(rank(cluster, ties.method="min")))
 
@@ -20,6 +20,7 @@ plot_2d_projection_brush <- function(Z, path, g1, g2, cluster, id, slider) {
 
   p <- ggplot2::ggplot(data=df, ggplot2::aes(x=x, y=y, label=id)) +
     ggplot2::geom_point(ggplot2::aes(x=x, y=y, color=factor(cols)), size=0.7) +
+    {if (adjust != 0) ggplot2::geom_density2d(ggplot2::aes(x=x, y=y), adjust=adjust, alpha=.6)} +
     ggplot2::scale_color_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(unique(cols))]) +
     ggplot2::labs(x="", y="", color="Class") +
     ggplot2::geom_segment(data=df[1:length(path_ids),],

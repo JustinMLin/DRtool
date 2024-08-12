@@ -27,6 +27,7 @@ run_app <- function(Z_dist, X, cluster, id=NULL) {
         sidebar=bslib::sidebar(
           shiny::numericInput("from", "From ID", value = 0),
           shiny::numericInput("to", "To ID", value = 0),
+          shiny::numericInput("adjust", "Bandwidth Adjustment", value = 0, step = .05),
           shiny::uiOutput("slider"),
           shiny::radioButtons("med_subtree1",
                               label = "Show medoid subtree?",
@@ -56,6 +57,7 @@ run_app <- function(Z_dist, X, cluster, id=NULL) {
           shiny::actionButton("clear_brush", "Clear Groups"),
           shiny::numericInput("from_brush", "From ID", value=0),
           shiny::numericInput("to_brush", "To ID", value=0),
+          shiny::numericInput("adjust_brush", "Bandwidth Adjustment", value = 0, step = .05),
           shiny::uiOutput("slider_brush"),
           shiny::radioButtons("med_subtree2",
                               label = "Show medoid subtree?",
@@ -126,7 +128,7 @@ run_app <- function(Z_dist, X, cluster, id=NULL) {
         return(plotly::plotly_empty())
       }
 
-      ret <- plot_2d_projection(Z, shortest_path(), cluster, id, input$slider)
+      ret <- plot_2d_projection(Z, shortest_path(), cluster, id, input$slider, input$adjust)
 
       plotly::ggplotly(ret$p,
                        tooltip = c("x", "y", "label")) %>%
@@ -250,7 +252,7 @@ run_app <- function(Z_dist, X, cluster, id=NULL) {
         return(plotly::plotly_empty())
       }
 
-      ret <- plot_2d_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, id, input$slider_brush)
+      ret <- plot_2d_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, id, input$slider_brush, input$adjust_brush)
 
       plotly::ggplotly(ret$p,
                        tooltip = c("x", "y", "label")) %>%
