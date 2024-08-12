@@ -1,5 +1,7 @@
 get_subtree <- function(tree, points) {
-  vertices = unique(unlist(igraph::all_simple_paths(tree, from=points[1], to=points[-1], mode="out")))
+  vertices <- ifelse(length(points) == 1,
+                    points,
+                    unique(unlist(igraph::all_simple_paths(tree, from=points[1], to=points[-1], mode="out")))
   igraph::induced_subgraph(tree, vertices)
 }
 
@@ -35,10 +37,12 @@ plot_medoid_mst <- function(plot, df, Z_dist, tree) {
 
   edge_matrix <- as.matrix(med_tree, matrix.type="edgelist")
 
-  n = length(edge_matrix[,1])
+  n <- length(edge_matrix[,1])
 
-  for (i in 1:n) {
-    plot <- plot + ggplot2::geom_path(data=df[as.numeric(edge_matrix[i,]),], color = "black")
+  if (n > 0) {
+    for (i in 1:n) {
+      plot <- plot + ggplot2::geom_path(data=df[as.numeric(edge_matrix[i,]),], color = "black")
+    }
   }
 
   plot
