@@ -1,7 +1,7 @@
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z_dist, X, cluster, id=NULL) {
-  Z_dist <- unname(Z_dist)
+run_app <- function(Z, X, cluster, id=NULL) {
+  Z_dist <- unname(dist(Z))
   X <- unname(X)
 
   if (is.null(id)) {id <- 1:nrow(X)}
