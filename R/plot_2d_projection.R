@@ -4,7 +4,7 @@ plot_2d_projection <- function(Z, path, cluster, id, slider, adjust) {
 
   path_ids <- as.numeric(path$vpath)
   path_pts <- Z[path_ids,]
-  pca <- prcomp(path_pts, rank.=2)
+  pca <- prcomp(path_pts, scale.=TRUE, rank.=2)
   var_explained <- sum(pca$sdev[1:2]^2)/sum(pca$sdev^2)
 
   first_label <- cluster[path_ids[1]]
