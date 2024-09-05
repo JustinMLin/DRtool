@@ -4,7 +4,7 @@ plot_2d_projection_brush <- function(Z, path, g1, g2, cluster, id, slider, adjus
 
   path_ids <- as.numeric(path$vpath)
   path_pts <- Z[path_ids,]
-  pca <- prcomp(path_pts, scale.=TRUE, rank.=2)
+  pca <- prcomp(path_pts, rank.=2)
   var_explained <- sum(pca$sdev[1:2]^2)/sum(pca$sdev^2)
 
   ids <- unique(c(path_ids, g1, g2))
