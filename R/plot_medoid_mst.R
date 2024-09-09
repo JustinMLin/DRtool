@@ -1,5 +1,5 @@
 get_subtree <- function(tree, points) {
-  vertices <- if (length(points) == 1 points else unique(unlist(igraph::all_simple_paths(tree, from=points[1], to=points[-1], mode="out")))
+  vertices <- if (length(points) == 1) points else unique(unlist(igraph::all_simple_paths(tree, from=points[1], to=points[-1], mode="out")))
   igraph::induced_subgraph(tree, vertices)
 }
 

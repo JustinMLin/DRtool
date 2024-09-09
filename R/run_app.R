@@ -16,7 +16,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
     ggplot2::labs(color="Class")
   medoid_p = plot_medoid_mst(p, plotting_df, Z_dist, tree)
 
-  ui <- bslib::page_navbar(
+  ui <- page_navbar(
     title="Dimension Reduction Tool",
     theme=bslib::bs_theme(bootswatch="cosmo"),
     fillable=FALSE,
@@ -25,14 +25,29 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
       bslib::layout_sidebar(
         sidebar=bslib::sidebar(
-          shiny::numericInput("from", "From ID", value = 0),
-          shiny::numericInput("to", "To ID", value = 0),
-          shiny::numericInput("adjust", "Bandwidth Adjustment", value = 0, step = .05),
-          shiny::uiOutput("slider"),
+          open="always",
+          bslib::accordion(
+            multiple=FALSE,
+            style="--bs-accordion-btn-bg: #f2f2f2",
+            bslib::accordion_panel(
+              "Path Selection",
+              style="background-color: #f2f2f2",
+              shiny::numericInput("from", "From ID", value = 0),
+              shiny::numericInput("to", "To ID", value = 0)
+            ),
+            bslib::accordion_panel(
+              "Path Projection Settings",
+              style="background-color: #f2f2f2",
+              shiny::numericInput("dim", "Dimension", min=2, max=dim(Z)[2], value=2, step=1),
+              shiny::sliderInput("degree", "CCA Degree", min=2, max=10, value=2, step=1),
+              shiny::sliderInput("adjust", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05)
+            )
+          ),
           shiny::radioButtons("med_subtree1",
-                              label = "Show medoid subtree?",
-                              choices = c("Hide", "Show"),
-                              inline = TRUE)
+                       label = "Show medoid subtree?",
+                       choices = c("Hide", "Show"),
+                       inline = TRUE),
+          shiny::uiOutput("slider")
         ),
 
         bslib::card(
@@ -42,8 +57,8 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
+          bslib::nav_panel("2D Path Projection", plotlyOutput("projPath")),
+          bslib::nav_panel("Path Weights", plotOutput("pathWeights"))
         )
       )
     ),
@@ -52,17 +67,48 @@ run_app <- function(Z, X, cluster, id=NULL) {
       title="Custom Clusters",
       bslib::layout_sidebar(
         sidebar=bslib::sidebar(
-          shiny::actionButton("group1", "Submit Group 1"),
-          shiny::actionButton("group2", "Submit Group 2"),
-          shiny::actionButton("clear_brush", "Clear Groups"),
-          shiny::numericInput("from_brush", "From ID", value=0),
-          shiny::numericInput("to_brush", "To ID", value=0),
-          shiny::numericInput("adjust_brush", "Bandwidth Adjustment", value = 0, step = .05),
-          shiny::uiOutput("slider_brush"),
+          open="always",
+          bslib::accordion(
+            multiple=FALSE,
+            style="--bs-accordion-btn-bg: #f2f2f2",
+            bslib::accordion_panel(
+              "Group Selection",
+              style="background-color: #f2f2f2",
+              shiny::actionButton("group1", "Submit Group 1",
+                           style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+              shiny::actionButton("group2", "Submit Group 2",
+                           style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+              shiny::actionButton("clear_brush", "Clear Groups",
+                           style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+              shiny::numericInput("from_brush", "From ID", value = 0),
+              shiny::numericInput("to_brush", "To ID", value = 0)
+            ),
+            bslib::accordion_panel(
+              "Path Projection Settings",
+              style="background-color: #f2f2f2",
+              shiny::numericInput("dim_brush", "Dimension", min=2, max=dim(Z)[2], value=2, step=1),
+              shiny::sliderInput("degree_brush", "CCA Degree", min=2, max=10, value=2, step=1),
+              shiny::sliderInput("adjust_brush", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05),
+              shiny::radioButtons("path_color_brush",
+                           label="Path Projection Coloring",
+                           choices=c("Original Coloring", "Group Coloring"),
+                           selected="Original Coloring")
+            )
+          ),
           shiny::radioButtons("med_subtree2",
-                              label = "Show medoid subtree?",
-                              choices = c("Hide", "Show"),
-                              inline = TRUE)
+                       label = "Show medoid subtree?",
+                       choices = c("Hide", "Show"),
+                       inline = TRUE),
+          shiny::uiOutput("slider_brush")
         ),
 
         bslib::card(
@@ -72,8 +118,8 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush")),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush"))
+          bslib::nav_panel("2D Path Projection", plotlyOutput("projPath_brush")),
+          bslib::nav_panel("Path Weights", plotOutput("pathWeights_brush"))
         )
       )
     )
@@ -125,10 +171,10 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
     output$projPath <- plotly::renderPlotly({
       if (is.null(shortest_path())) {
-        return(plotly::plotly_empty())
+        return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection(Z, shortest_path(), cluster, id, input$slider, input$adjust)
+      ret <- plot_2d_projection(Z, shortest_path(), cluster, id, input$dim, input$degree, input$slider, input$adjust)
 
       plotly::ggplotly(ret$p,
                        tooltip = c("x", "y", "label")) %>%
@@ -142,7 +188,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
     output$pathWeights <- shiny::renderPlot({
       if (is.null(shortest_path())) {
-        return(plotly::plotly_empty())
+        return(plotly::plotly_empty(type="bar"))
       }
 
       plot_path_weights(shortest_path(), input$slider, max_length)
@@ -168,14 +214,18 @@ run_app <- function(Z, X, cluster, id=NULL) {
       d <- plotly::event_data("plotly_selecting")
       rv$g1 <- as.numeric(d$key)
 
-      shiny::updateNumericInput(inputId="from_brush", value=id[get_medoid(Z_dist, rv$g1)])
+      if (length(rv$g1) > 0) {
+        shiny::updateNumericInput(inputId="from_brush", value=id[get_medoid(Z_dist, rv$g1)])
+      } else rv$g1 <- NULL
     })
 
     shiny::observeEvent(input$group2, {
       d <- plotly::event_data("plotly_selecting")
       rv$g2 <- as.numeric(d$key)
 
-      shiny::updateNumericInput(inputId="to_brush", value=id[get_medoid(Z_dist, rv$g2)])
+      if (length(rv$g2) > 0) {
+        updateNumericInput(inputId="to_brush", value=id[get_medoid(Z_dist, rv$g2)])
+      } else rv$g2 <- NULL
     })
 
     shiny::observeEvent(input$clear_brush, {
@@ -222,7 +272,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
           plotly::ggplotly(p_brush,
                            tooltip = c("x", "y", "label")) %>%
-            plotly::layout(dragmode='select') %>%
+            plotly::layout(dragmode='lasso') %>%
             plotly::event_register("plotly_selecting")
         }
         else {
@@ -241,18 +291,21 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
           plotly::ggplotly(add_path(p_brush, plotting_df, shortest_path_brush(), input$slider_brush),
                            tooltip = c("x", "y", "label")) %>%
-            plotly::layout(dragmode='select') %>%
+            plotly::layout(dragmode='lasso') %>%
             plotly::event_register("plotly_selecting")
         }
       }
     })
 
     output$projPath_brush <- plotly::renderPlotly({
-      if (is.null(rv$g1) | is.null (rv$g2)) {
-        return(plotly::plotly_empty())
+      if (is.null(shortest_path_brush())) {
+        return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, id, input$slider_brush, input$adjust_brush)
+      ret <- plot_2d_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2,
+                                      cluster, id, input$dim_brush, input$degree_brush,
+                                      input$slider_brush, input$adjust_brush,
+                                      input$path_color_brush)
 
       plotly::ggplotly(ret$p,
                        tooltip = c("x", "y", "label")) %>%
@@ -261,7 +314,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
                                 xref='paper', yref='paper',
                                 x=1, y=1,
                                 showarrow = FALSE) %>%
-        plotly::layout(showlegend = FALSE)
+        {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
     })
 
     output$pathWeights_brush <- shiny::renderPlot({

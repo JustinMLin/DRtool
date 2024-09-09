@@ -1,7 +1,7 @@
 get_path_weights <- function(path) {
   epath <- path$epath
 
-  if (class(epath) != "igraph.es") {
+  if (!inherits(epath, "igraph.es")) {
     stop("get_path_weights: input is not of type igraph.es")
   }
 
