@@ -55,7 +55,7 @@ plot_2d_projection_brush <- function(Z, path, g1, g2, cluster, id, dim, degree, 
     {if (color_choice == "Group Coloring") ggplot2::scale_color_manual(values=c("black", "#F8766D", "#00BFC4", "#C77CFF"), drop=FALSE)} +
     ggplot2::labs(title=paste0("CCA with degree ", degree), x="", y="", color="Color") +
     ggplot2::geom_segment(data=df[1:length(path_ids),],
-                          ggplot2::aes(xend=lead(x), yend=lead(y)),
+                          ggplot2::aes(xend=dplyr::lead(x), yend=dplyr::lead(y)),
                           color = factor(color),
                           linewidth=0.3)
 

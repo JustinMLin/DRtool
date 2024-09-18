@@ -39,7 +39,7 @@ plot_2d_projection <- function(Z, path, cluster, id, dim, degree, slider, adjust
     ggplot2::scale_color_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(unique(cols))]) +
     ggplot2::labs(title=paste0("CCA with degree ", degree), x="", y="", color="Class") +
     ggplot2::geom_segment(data=df[1:length(path_ids),],
-                          ggplot2::aes(xend=lead(x), yend=lead(y)),
+                          ggplot2::aes(xend=dplyr::lead(x), yend=dplyr::lead(y)),
                           color = factor(color),
                           linewidth=0.3)
 

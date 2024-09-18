@@ -16,7 +16,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
     ggplot2::labs(color="Class")
   medoid_p = plot_medoid_mst(p, plotting_df, Z_dist, tree)
 
-  ui <- page_navbar(
+  ui <- bslib::page_navbar(
     title="Dimension Reduction Tool",
     theme=bslib::bs_theme(bootswatch="cosmo"),
     fillable=FALSE,
@@ -57,8 +57,8 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("2D Path Projection", plotlyOutput("projPath")),
-          bslib::nav_panel("Path Weights", plotOutput("pathWeights"))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
+          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
         )
       )
     ),
@@ -118,8 +118,8 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("2D Path Projection", plotlyOutput("projPath_brush")),
-          bslib::nav_panel("Path Weights", plotOutput("pathWeights_brush"))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush")),
+          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush"))
         )
       )
     )
