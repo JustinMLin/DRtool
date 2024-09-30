@@ -40,7 +40,11 @@ run_app <- function(Z, X, cluster, id=NULL) {
               style="background-color: #f2f2f2",
               shiny::numericInput("dim", "Dimension", min=2, max=dim(Z)[2], value=2, step=1),
               shiny::sliderInput("degree", "CCA Degree", min=2, max=10, value=2, step=1),
-              shiny::sliderInput("adjust", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05)
+              shiny::sliderInput("adjust", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05),
+              shiny::radioButtons("show_all_edges",
+                                  label = "Show all MST edges?",
+                                  choices = c("Hide", "Show"),
+                                  inline = TRUE)
             )
           ),
           shiny::radioButtons("med_subtree1",
@@ -98,6 +102,10 @@ run_app <- function(Z, X, cluster, id=NULL) {
               shiny::numericInput("dim_brush", "Dimension", min=2, max=dim(Z)[2], value=2, step=1),
               shiny::sliderInput("degree_brush", "CCA Degree", min=2, max=10, value=2, step=1),
               shiny::sliderInput("adjust_brush", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05),
+              shiny::radioButtons("show_all_edges_brush",
+                                  label = "Show all MST edges?",
+                                  choices = c("Hide", "Show"),
+                                  inline = TRUE),
               shiny::radioButtons("path_color_brush",
                            label="Path Projection Coloring",
                            choices=c("Original Coloring", "Group Coloring"),
@@ -136,6 +144,13 @@ run_app <- function(Z, X, cluster, id=NULL) {
       sp
     })
 
+    projected_pts <- shiny::reactive({
+      if (is.null(shortest_path())) NULL
+      else {
+        get_projection(Z, shortest_path(), cluster, input$dim, input$degree)
+      }
+    })
+
     output$slider <- shiny::renderUI({
       max <- ifelse(is.null(shortest_path()),
                    0,
@@ -170,11 +185,14 @@ run_app <- function(Z, X, cluster, id=NULL) {
     })
 
     output$projPath <- plotly::renderPlotly({
-      if (is.null(shortest_path())) {
+      if (is.null(projected_pts())) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection(Z, shortest_path(), cluster, id, input$dim, input$degree, input$slider, input$adjust)
+      ret <- plot_2d_projection(tree, cluster, projected_pts()$projected_pts,
+                                projected_pts()$ids, projected_pts()$path_ids,
+                                projected_pts()$var_explained, input$degree,
+                                input$slider, input$adjust, input$show_all_edges)
 
       plotly::ggplotly(ret$p,
                        tooltip = c("x", "y", "label")) %>%
@@ -210,6 +228,13 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
     rv <- shiny::reactiveValues(g1 = NULL, g2 = NULL)
 
+    projected_pts_brush <- shiny::reactive({
+      if (is.null(shortest_path_brush())) NULL
+      else {
+        get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
+      }
+    })
+
     shiny::observeEvent(input$group1, {
       d <- plotly::event_data("plotly_selecting")
       rv$g1 <- as.numeric(d$key)
@@ -224,7 +249,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
       rv$g2 <- as.numeric(d$key)
 
       if (length(rv$g2) > 0) {
-        updateNumericInput(inputId="to_brush", value=id[get_medoid(Z_dist, rv$g2)])
+        shiny::updateNumericInput(inputId="to_brush", value=id[get_medoid(Z_dist, rv$g2)])
       } else rv$g2 <- NULL
     })
 
@@ -298,28 +323,41 @@ run_app <- function(Z, X, cluster, id=NULL) {
     })
 
     output$projPath_brush <- plotly::renderPlotly({
-      if (is.null(shortest_path_brush())) {
+      if (is.null(projected_pts_brush())) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2,
-                                      cluster, id, input$dim_brush, input$degree_brush,
-                                      input$slider_brush, input$adjust_brush,
+      ret <- plot_2d_projection_brush(tree, cluster, rv$g1, rv$g2, projected_pts_brush()$projected_pts,
+                                      projected_pts_brush()$ids, projected_pts_brush()$path_ids,
+                                      projected_pts_brush()$var_explained, input$degree_brush,
+                                      input$slider_brush, input$adjust_brush, input$show_all_edges_brush,
                                       input$path_color_brush)
 
-      plotly::ggplotly(ret$p,
-                       tooltip = c("x", "y", "label")) %>%
+      q = plotly::ggplotly(ret$p, tooltip = c("x", "y", "label"))
+
+      # edit legend after conversion to plotly because ggplotly changes legend
+      for (i in 1:length(q$x$data)) {
+        if (q$x$data[[i]]$mode == "markers") {
+          q$x$data[[i]]$name = stringr::str_extract(q$x$data[[i]]$name, "(?<=\\().+(?=(,1\\)))")
+        }
+        else if (q$x$data[[i]]$mode == "lines") {
+          q$x$data[[i]]$showlegend = FALSE
+        }
+      }
+
+      q %>%
         plotly::layout(dragmode='pan') %>%
         plotly::add_annotations(text=paste(round(ret$var_explained, 2)),
                                 xref='paper', yref='paper',
                                 x=1, y=1,
                                 showarrow = FALSE) %>%
+        plotly:: layout(legend=list(title=list(text="Group"))) %>%
         {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
     })
 
     output$pathWeights_brush <- shiny::renderPlot({
       if (is.null(shortest_path_brush())) {
-        return(plotly::plotly_empty())
+        return(plotly::plotly_empty(type="bar"))
       }
 
       plot_path_weights(shortest_path_brush(), input$slider_brush, max_length)
