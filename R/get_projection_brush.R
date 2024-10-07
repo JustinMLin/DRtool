@@ -14,10 +14,16 @@ get_projection_brush <- function(Z, path, g1, g2, cluster, dim, degree) {
     ref_mat[,i] <- (1:length(path$vpath))^i
   }
 
-  invisible(capture.output(lambda <- CCA::estim.regul(X[1:length(path_ids),], ref_mat,
-                                                      grid1=seq(0.001, 1, length.out=10), grid2=c(0),
-                                                      plt=FALSE)$lambda1))
-  cc1 <- CCA::rcc(X[1:length(path_ids),], ref_mat, lambda, 0)
+  if (length(path_ids == 2)) {
+    proj_pca = prcomp(path_pts, rank.=2)
+    projected_pts = predict(proj_pca, pts)
+  } else {
+    invisible(capture.output(lambda <- CCA::estim.regul(X[1:length(path_ids),], ref_mat,
+                                                        grid1=seq(0.001, 1, length.out=10), grid2=c(0),
+                                                        plt=FALSE)$lambda1))
+    cc1 <- CCA::rcc(X[1:length(path_ids),], ref_mat, lambda, 0)
+    projected_pts = X %*% cc1$xcoef
+  }
 
-  list(projected_pts = X %*% cc1$xcoef, ids = ids, path_ids = path_ids, var_explained = var_explained)
+  list(projected_pts = projected_pts, ids = ids, path_ids = path_ids, var_explained = var_explained)
 }

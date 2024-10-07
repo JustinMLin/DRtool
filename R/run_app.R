@@ -135,6 +135,8 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
   server <- function(input, output) {
     shortest_path <- shiny::reactive({
+      if (input$from == input$to) return(NULL)
+
       sp <- tryCatch({
         get_shortest_path(tree, which(id == input$from), which(id == input$to))
       }, error = function(err) {
