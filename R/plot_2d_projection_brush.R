@@ -48,7 +48,7 @@ plot_2d_projection_brush <- function(mst, cluster, g1, g2, projected_pts, ids, p
   df <- ggnetwork::ggnetwork(plotting_graph, layout=projected_pts[order(ids),1:2])
 
   p <- ggplot2::ggplot(df) +
-    ggnetwork::geom_nodes(ggplot2::aes(x=x, y=y, fill=color, label=id), size=0.8, color="transparent", shape=21) +
+    suppressWarnings(ggnetwork::geom_nodes(ggplot2::aes(x=x, y=y, fill=color, label=id), size=0.8, color="transparent", shape=21)) +
     {if (color_choice == "Original Coloring") ggplot2::scale_fill_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(unique(cluster[ids]))])} +
     {if (color_choice == "Group Coloring") ggplot2::scale_fill_manual(values=c("black", "#F8766D", "#00BFC4", "#C77CFF"), drop=FALSE)} +
     ggnetwork::geom_edges(data=df[df$edge_type == "path",],
