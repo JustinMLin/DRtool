@@ -191,7 +191,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection(tree, cluster, projected_pts()$projected_pts,
+      ret <- plot_2d_projection(tree, cluster, id, projected_pts()$projected_pts,
                                 projected_pts()$ids, projected_pts()$path_ids,
                                 projected_pts()$var_explained, input$degree,
                                 input$slider, input$adjust, input$show_all_edges)
@@ -329,7 +329,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
-      ret <- plot_2d_projection_brush(tree, cluster, rv$g1, rv$g2, projected_pts_brush()$projected_pts,
+      ret <- plot_2d_projection_brush(tree, cluster, id, rv$g1, rv$g2, projected_pts_brush()$projected_pts,
                                       projected_pts_brush()$ids, projected_pts_brush()$path_ids,
                                       projected_pts_brush()$var_explained, input$degree_brush,
                                       input$slider_brush, input$adjust_brush, input$show_all_edges_brush,

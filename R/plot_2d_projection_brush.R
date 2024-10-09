@@ -1,5 +1,5 @@
 #' @importFrom magrittr "%>%"
-plot_2d_projection_brush <- function(mst, cluster, g1, g2, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges, color_choice) {
+plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges, color_choice) {
   if (color_choice == "Original Coloring") {
     cols <- cluster[sort(ids)]
   }
@@ -47,6 +47,17 @@ plot_2d_projection_brush <- function(mst, cluster, g1, g2, projected_pts, ids, p
 
   df <- ggnetwork::ggnetwork(plotting_graph, layout=projected_pts[order(ids),1:2])
 
+  #ggnetwork overlays multiple nodes so density must be constructed from projected_pts
+  #ggnetwork scales data fit in [0,1] x [0,1]
+  m_hor = (max(projected_pts[,1]) - min(projected_pts[,1]))^{-1}
+  b_hor = min(projected_pts[,1]) * -m_hor
+
+  m_vert = (max(projected_pts[,2]) - min(projected_pts[,2]))^{-1}
+  b_vert = min(projected_pts[,2]) * -m_vert
+
+  df_points = data.frame(x=m_hor*projected_pts[,1] + b_hor,
+                         y=m_vert*projected_pts[,2] + b_vert)
+
   p <- ggplot2::ggplot(df) +
     suppressWarnings(ggnetwork::geom_nodes(ggplot2::aes(x=x, y=y, fill=color, label=id), size=0.8, color="transparent", shape=21)) +
     {if (color_choice == "Original Coloring") ggplot2::scale_fill_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(unique(cluster[ids]))])} +
@@ -56,7 +67,7 @@ plot_2d_projection_brush <- function(mst, cluster, g1, g2, projected_pts, ids, p
     ggplot2::scale_color_manual(values=c("black", "red")) +
     {if (show_all_edges == "Show")ggnetwork::geom_edges(data=df[df$edge_type == "non-path",],
                                                         ggplot2::aes(x=x, y=y, xend=xend, yend=yend), linewidth=0.3, alpha=0.2)} +
-    {if (adjust != 0) ggplot2::geom_density2d(ggplot2::aes(x=x, y=y), inherit.aes=FALSE, adjust=adjust, alpha=.5)} +
+    {if (adjust != 0) ggplot2::geom_density2d(data=df_points, ggplot2::aes(x=x, y=y), adjust=adjust, alpha=.5)} +
     ggplot2::labs(title=paste0("CCA with degree ", degree), x="", y="", color="Class")
 
   # ggplotly doesn't translate geom_text, add annotation later
