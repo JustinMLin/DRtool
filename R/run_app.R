@@ -61,6 +61,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
+          bslib::nav_panel("Heatmap", shiny::plotOutput("heatmap")),
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
           bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
         )
@@ -126,6 +127,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
+          bslib::nav_panel("Heatmap", shiny::plotOutput("heatmap_brush")),
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush")),
           bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush"))
         )
@@ -184,6 +186,12 @@ run_app <- function(Z, X, cluster, id=NULL) {
             plotly::layout(dragmode='pan')
         }
       }
+    })
+
+    output$heatmap <- shiny::renderPlot({
+      tryCatch({
+        plot_heatmap(Z, shortest_path(), cluster)
+      }, error = function(e) {})
     })
 
     output$projPath <- plotly::renderPlotly({
@@ -322,6 +330,12 @@ run_app <- function(Z, X, cluster, id=NULL) {
             plotly::event_register("plotly_selecting")
         }
       }
+    })
+
+    output$heatmap_brush <- shiny::renderPlot({
+      tryCatch({
+        plot_heatmap_brush(Z, rv$g1, rv$g2)
+      }, error = function(e) {})
     })
 
     output$projPath_brush <- plotly::renderPlotly({

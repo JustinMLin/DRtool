@@ -24,4 +24,6 @@ Imports:
     dplyr,
     ggnetwork,
     stringr
+Remotes:
+    jokergoo/ComplexHeatmap
 LazyData: true
