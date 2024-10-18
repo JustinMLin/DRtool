@@ -65,8 +65,8 @@ plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, id
     ggnetwork::geom_edges(data=df[df$edge_type == "path",],
                           ggplot2::aes(x=x, y=y, xend=xend, yend=yend, color=path_color), linewidth=0.3) +
     ggplot2::scale_color_manual(values=c("black", "red")) +
-    {if (show_all_edges == "Show")ggnetwork::geom_edges(data=df[df$edge_type == "non-path",],
-                                                        ggplot2::aes(x=x, y=y, xend=xend, yend=yend), linewidth=0.3, alpha=0.2)} +
+    {if (show_all_edges == "Show") ggnetwork::geom_edges(data=df[df$edge_type == "non-path",],
+                                                         ggplot2::aes(x=x, y=y, xend=xend, yend=yend), linewidth=0.3, alpha=0.2)} +
     {if (adjust != 0) ggplot2::geom_density2d(data=df_points, ggplot2::aes(x=x, y=y), adjust=adjust, alpha=.5)} +
     ggplot2::labs(title=paste0("CCA with degree ", degree), x="", y="", color="Class")
 
