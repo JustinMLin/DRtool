@@ -1,3 +1,21 @@
+#' Overlays path onto existing plot
+#'
+#' `add_path()` returns a plot with the path, specified by `df` and `path`,
+#' overlaid. `slider` can be used to highlight a specific segment of the plot.
+#'
+#' @param plot A `ggplot` object. Plot the path is to be overlaid upon.
+#' @param df A data frame containing columns named `x` and `y` containing the
+#' coordinates of the points in the plot.
+#' @param path A named list with two entries:
+#'    * `vpath`
+#'    * `epath`
+#'
+#' `igraph` uses these objects to describe paths. See [igraph::distance_table()]
+#' for details.
+#' @param slider A non-negative numeric denoting which segment in the path to
+#' highlight. If `slider = 0`, no segment will be highlighted.
+#'
+#' @returns A `ggplot` object.
 add_path <- function(plot, df, path, slider=0) {
   path_ids <- as.numeric(path$vpath)
 
