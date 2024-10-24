@@ -1,4 +1,4 @@
-#' Compute the minimum spanning tree of set of points.
+#' Compute the minimum spanning tree of set of points
 #'
 #' Returns an `igraph` object containing the minimum spanning tree. Constructs a
 #' graph using [igraph::graph_from_adjacency_matrix()], then calculates the minimum

@@ -1,3 +1,34 @@
+#' Launch the dimension reduction tool
+#'
+#' Launches the dimension reduction tool. The required inputs are the
+#' high-dimensional data matrix, the low-dimensional data matrix, and the clustering.
+#' Optionally, a vector of ids can be given to annotate the points.
+#'
+#' @param Z A numerical matrix. The high-dimensional data.
+#' @param X A numerical matrix satisfying `nrow(X) = nrow(Z)` and
+#' `ncol(X) = 2`.
+#' @param cluster A numerical vector or factor of length `nrow(Z)`.
+#' @param id A vector of length `nrow(Z)`. If `id = NULL`, the ids will be set
+#' to the indices of the points.
+#'
+#' @examples
+#' library(MASS)
+#' library(Rtsne)
+#'
+#' # construct high-dimensional data, three clusters
+#' Z1 <- mvrnorm(n=30, mu=c(0,0,0,0,0), Sigma=diag(rep(1,5)))
+#' Z2 <- mvrnorm(n=30, mu=c(0,2,0,0,0), Sigma=diag(rep(1,5)))
+#' Z3 <- mvrnorm(n=30, mu=c(0,0,2,0,0), Sigma=diag(rep(1,5)))
+#' Z <- rbind(Z1, Z2, Z3)
+#'
+#' # compute low-dimensional embedding using t-SNE
+#' X <- Rtsne(Z, dims=2, perplexity=30)$Y
+#'
+#' # compute k-means clustering
+#' cluster <- kmeans(Z, centers=3, nstart=10)$cluster
+#'
+#' #launch tool
+#' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, id=NULL) {

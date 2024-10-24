@@ -1,3 +1,4 @@
+#' @rdname plot_2d_projection
 #' @importFrom magrittr "%>%"
 plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges, color_choice) {
   if (color_choice == "Original Coloring") {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_mst.R
 \name{get_mst}
 \alias{get_mst}
-\title{Compute the minimum spanning tree of set of points.}
+\title{Compute the minimum spanning tree of set of points}
 \usage{
 get_mst(Z_dist)
 }

@@ -6,12 +6,7 @@
 #' @param plot A `ggplot` object. Plot the path is to be overlaid upon.
 #' @param df A data frame containing columns named `x` and `y` containing the
 #' coordinates of the points in the plot.
-#' @param path A named list with two entries:
-#'    * `vpath`
-#'    * `epath`
-#'
-#' `igraph` uses these objects to describe paths. See [igraph::distance_table()]
-#' for details.
+#' @param A named list returned by `get_shortest_path()`.
 #' @param slider A non-negative numeric denoting which segment in the path to
 #' highlight. If `slider = 0`, no segment will be highlighted.
 #'

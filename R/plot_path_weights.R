@@ -1,3 +1,10 @@
+#' Get path weights
+#'
+#' Returns a vector of weights for a given path.
+#'
+#' @param path A named list returned by [get_shortest_path()].
+#'
+#' @returns A numerical vector of length `length(path$epath)`.
 get_path_weights <- function(path) {
   epath <- path$epath
 
@@ -15,6 +22,16 @@ get_path_weights <- function(path) {
   weights
 }
 
+#' Draw a barplot of path weights
+#'
+#' Draws a barplot of the path weights. A specific bar may be highlighted.
+#'
+#' @param path A named list returned by [get_shortest_path()].
+#' @param highlight A non-negative numeric determining which bar should be
+#' highlighted. If `highlight = 0`, no bar will be highlighted.
+#' @param max A numeric. The max value the bar heights should be scaled to.
+#'
+#' @returns A `ggplot` object.
 plot_path_weights <- function(path, highlight=0, max) {
   path_weights <- get_path_weights(path)
   num_paths <- length(path_weights)

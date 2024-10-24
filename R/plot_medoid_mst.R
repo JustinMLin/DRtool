@@ -1,8 +1,35 @@
+#' Get the minimum subtree comtaioning the specified vertices
+#'
+#' The subtree contains all of the specified vertices along with the shortest
+#' paths between each pair of them. Uses [igraph::induced_subgraph()].
+#'
+#' @param tree An `igraph` object
+#' @param points A numeric vector of vertex indices.
+#'
+#' @returns An `igraph` object.
+#'
+#' @examples
+#' tree <- make_tree(10, 3, mode="undirected")
+#' get_subtree(tree, c(1,2,3))
 get_subtree <- function(tree, points) {
   vertices <- if (length(points) == 1) points else unique(unlist(igraph::all_simple_paths(tree, from=points[1], to=points[-1], mode="out")))
   igraph::induced_subgraph(tree, vertices)
 }
 
+#' Get the medoid of each cluster
+#'
+#' Returns the indices of the medoid of each cluster in the data set.
+#'
+#' @param A `dist` object or numerical distance matrix.
+#' @param A vector of length `nrow(as.matrix(dist))`.
+#'
+#' @returns A numerical vector of medoid indices.
+#'
+#' @examples
+#' Z <- matrix(rnorm(20), nrow=5, ncol=4)
+#' Z_dist <- dist(Z)
+#' cluster <- c(1,1,2,2,2)
+#' get_medoids(Z_dist, cluster)
 get_medoids <- function(Z_dist, cluster) {
   meds <- c()
 
@@ -16,6 +43,25 @@ get_medoids <- function(Z_dist, cluster) {
   meds
 }
 
+#' Constructs the minimal subtree containing all cluster medoids
+#'
+#' Uses [get_medoids()] to calculate cluster medoids, then uses [get_subtree()]
+#' to get the minimal subtree.
+#'
+#' @param Z_dist A `dist` object or numerical distance matrix.
+#' @param mst An `igraph` object.
+#' @param cluster A vector of length `nrows(as.matrix(Z_dist))`.
+#'
+#' @returns An `igraph` object. The returned tree has vertex attribute `medoid`
+#' denoting which cluster each point is the medoid of. For non-medoid points,
+#' this attribute is NA.
+#'
+#' @examples
+#' Z <- matrix(rnorm(20), nrow=5, ncol=4)
+#' Z_dist <- dist(Z)
+#' mst = get_mst(Z_dist)
+#' cluster <- c(1,1,2,2,2)
+#' get_medoid_mst(Z_dist, mst, cluster)
 get_medoid_mst <- function(Z_dist, mst, cluster) {
   meds <- get_medoids(Z_dist, cluster)
 
@@ -30,6 +76,18 @@ get_medoid_mst <- function(Z_dist, mst, cluster) {
   tree
 }
 
+#' Overlays the minimal subtree containing all cluster medoids
+#'
+#' Uses [get_medoid_mst()] to construct the minimal subtree containing the
+#' cluster medoids, then overlays it over `plot`.
+#'
+#' @param plot A `ggplot` object.
+#' @param df A data frame containing columns named `x` and `y` containing the
+#' coordinates of the points in the plot.
+#' @param Z_dist A `dist` object or numerical distance matrix.
+#' @param An `igraph` object.
+#'
+#' @returns A `ggplot` object.
 plot_medoid_mst <- function(plot, df, Z_dist, tree) {
   med_tree <- get_medoid_mst(Z_dist, tree, df$cluster)
 

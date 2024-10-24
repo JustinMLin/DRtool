@@ -1,3 +1,41 @@
+#' Constructs plot of projected points
+#'
+#' Uses the output of [get_projection()] or [get_projection_brush()] to
+#' construct a plot of the projected points. Overlaid on the plot are the
+#' projected path and estimated density (optional). In addition, the use may
+#' choose to display all edges of the minimum spanning tree, not just the path.
+#'
+#' @param mst A `igraph` object.
+#' @param cluster A vector of length `nrow(projected_pts)` containing the
+#' cluster labels.
+#' @param id A numerical vector containing the labels of the points.
+#' @param g1 A numerical vector containing the indices of the points in group
+#' one.
+#' @param g2 A numerical vector containing the indices of the points in group
+#' two.
+#' @param projected_pts A numerical matrix with two columns.
+#' @param ids A numerical vector containing the indices of the projected points.
+#' @param path_ids A numerical vector containing the indices of the path points.
+#' @param var_explained A numeric.
+#' @param degree A numeric. The degree of the polynomial design matrix during
+#' rCCA when computing the projection.
+#' @param slider A numeric. Determines which segment of the path should be
+#' highlighted in the plot. If `slider = 0`, no segment will be highlighted.
+#' @param adjust A numeric. The bandwidth of the overlaid density estimation. If
+#' `adjust = 0`, the estimated density will not be overlaid the plot.
+#' @param show_all_edges "Show" or "Hide". If "Show", all edges of the minimum
+#' spanning tree will be drawn.
+#' @param color_choice "Original Coloring" or "Group Coloring". Determines if
+#' the colors of the projected points are returned or if they're colored
+#' according to the user-selected groups.
+#'
+#' @returns A named list containing the plot `p` and the variance explained
+#' `var_explained`.
+#'
+#' @details
+#' The variance explained is not written on the plot because it would get
+#' removed by [plotly::ggplotly()]. Instead the variance explained is passed along, then
+#' added after the plot is converted into a `plotly` object.
 #' @importFrom magrittr "%>%"
 plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges) {
   #induced_subgraph re-orders vertices by vids, low to high

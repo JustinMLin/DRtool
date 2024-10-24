@@ -1,3 +1,33 @@
+#' Compute the projection of the selected points using the PCA/rCCA method
+#'
+#' @description
+#' The selected points are first projected down to `dim` dimensions using PCA.
+#' They are then projected down to two dimensions using rCCA. The comparison
+#' matrix is the design matrix for a polynomial of degree `degree`. The points
+#' are selected in one of two ways:
+#' * `get_projection()` selects the path points along with all points belonging
+#' to the same cluster as one of path's endpoints.
+#' * `get_projection_brush()` selects the path points along with the points
+#' belonging to the two groups selected by the user.
+#'
+#' @param Z A numerical matrix containing the high-dimensional data.
+#' @param path A named list returned by `get_shortest_path()`.
+#' @param g1 A numerical vector of the indices of the points in group one.
+#' @param g2 A numerical vector of the indices of the points in group two.
+#' @param cluster A vector of length `nrow(Z)` with cluster labels.
+#' @param dim A numeric greater than or equal to 2.
+#' @param degree A positive numeric.
+#'
+#' @returns A list with the following components:
+#' \item{projected_pts}{A numerical matrix with two columns containing the
+#' projected coordinates.}
+#'
+#' \item{ids}{A numerical vector containing the indices of the selected points.}
+#'
+#' \item{path_ids}{A numerical vector containing the indices of the path points.}
+#'
+#' \item{var_explained}{A numeric. The proportion of variance retained during
+#' the PCA projection step.}
 get_projection <- function(Z, path, cluster, dim, degree) {
   path_ids <- as.numeric(path$vpath)
   path_pts <- Z[path_ids,]
