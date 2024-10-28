@@ -32,8 +32,24 @@
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, id=NULL) {
-  Z_dist <- unname(dist(Z))
+  if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
+    stop("Z and X must be matrices.")
+  }
+  if (nrow(Z) != nrow(X)) {
+    stop("Z and X must have an equal number of rows.")
+  }
+  if (length(cluster) != nrow(Z)) {
+    stop("The length of cluster must be equal to the number of rows of Z and X.")
+  }
+
+  if (!is.null(id) & length(id) != nrow(Z)) {
+    stop("The length of id must be equal to the number of rows of Z and X.")
+  }
+
+  Z = unname(Z)
   X <- unname(X)
+
+  Z_dist <- dist(Z)
 
   if (is.null(id)) {id <- 1:nrow(X)}
 
