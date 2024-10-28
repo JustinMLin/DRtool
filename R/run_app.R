@@ -4,8 +4,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
   Z_dist <- unname(dist(Z))
   X <- unname(X)
 
-  ht = Heatmap(mtcars)
-  ht = draw(ht)
+  col_names <- colnames(Z)
 
   if (is.null(id)) {id <- 1:nrow(X)}
 
@@ -64,7 +63,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput(heatmap_id="heatmap")),
+          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
           bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
         ),
@@ -130,7 +129,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("Heatmap", shiny::plotOutput("heatmap_brush")),
+          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush")),
           bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush"))
         )
@@ -155,6 +154,13 @@ run_app <- function(Z, X, cluster, id=NULL) {
       if (is.null(shortest_path())) NULL
       else {
         get_projection(Z, shortest_path(), cluster, input$dim, input$degree)
+      }
+    })
+
+    ht <- shiny::reactive({
+      if (is.null(shortest_path())) NULL
+      else {
+        plot_heatmap(Z, shortest_path(), cluster, col_names)
       }
     })
 
@@ -191,7 +197,12 @@ run_app <- function(Z, X, cluster, id=NULL) {
       }
     })
 
-    InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, heatmap_id="heatmap")
+    shiny::observe({
+      if (!is.null(ht())) {
+        ht <- ComplexHeatmap::draw(ht())
+        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
+      }
+    })
 
     output$projPath <- plotly::renderPlotly({
       if (is.null(projected_pts())) {
@@ -221,7 +232,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
       plot_path_weights(shortest_path(), input$slider, max_length)
     })
 
-    #######################
+    ###########################################################################
 
     shortest_path_brush <- shiny::reactive({
       sp <- tryCatch({
@@ -241,6 +252,13 @@ run_app <- function(Z, X, cluster, id=NULL) {
       if (is.null(shortest_path_brush())) NULL
       else {
         get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
+      }
+    })
+
+    ht_brush <- shiny::reactive({
+      if (is.null(shortest_path_brush())) NULL
+      else {
+        plot_heatmap_brush(Z, rv$g1, rv$g2, col_names)
       }
     })
 
@@ -310,10 +328,10 @@ run_app <- function(Z, X, cluster, id=NULL) {
             plotly::event_register("plotly_selecting")
         }
         else {
-          alpha_id = unique(c(rv$g1, rv$g2))
+          alpha_id <- unique(c(rv$g1, rv$g2))
           if (!is.null(alpha_id)) {
-            alpha = rep(0.3, nrow(X))
-            alpha[alpha_id] = 1
+            alpha <- rep(0.3, nrow(X))
+            alpha[alpha_id] <- 1
           }
           else {
             alpha <- rep(1, nrow(X))
@@ -331,10 +349,11 @@ run_app <- function(Z, X, cluster, id=NULL) {
       }
     })
 
-    output$heatmap_brush <- shiny::renderPlot({
-      tryCatch({
-        plot_heatmap_brush(Z, rv$g1, rv$g2)
-      }, error = function(e) {})
+    shiny::observe({
+      if (!is.null(ht_brush())) {
+        ht <- ComplexHeatmap::draw(ht_brush())
+        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap_brush")
+      }
     })
 
     output$projPath_brush <- plotly::renderPlotly({
@@ -379,5 +398,5 @@ run_app <- function(Z, X, cluster, id=NULL) {
     })
   }
 
-  shiny::shinyApp(ui=ui, server=server)
+  shiny::shinyApp(ui, server)
 }

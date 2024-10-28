@@ -23,8 +23,10 @@ Imports:
     CCA,
     dplyr,
     ggnetwork,
-    stringr
+    stringr,
+    ComplexHeatmap,
+    InteractiveComplexHeatmap
 Remotes:
     jokergoo/ComplexHeatmap,
-    Joker goo/InteractiveComplexHeatmap
+    jokergoo/InteractiveComplexHeatmap
 LazyData: true

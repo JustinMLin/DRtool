@@ -1,4 +1,4 @@
-plot_heatmap <- function(Z, path, cluster) {
+plot_heatmap <- function(Z, path, cluster, col_names) {
   path_ids <- as.numeric(path$vpath)
 
   first_label <- cluster[path_ids[1]]
@@ -15,10 +15,12 @@ plot_heatmap <- function(Z, path, cluster) {
     group <- rep(c(first_label, last_label), times=c(length(first_ids), length(last_ids)))
   }
 
-  pts <- prcomp(Z[ids,], rank.=100)$x
+  pts <- Z[ids,]
 
   ComplexHeatmap::Heatmap(pts, row_split=group,
+                          column_labels = col_names,
                           show_row_dend=FALSE,
                           show_column_dend=FALSE, show_column_names=FALSE,
-                          show_heatmap_legend=FALSE)
+                          show_heatmap_legend=FALSE,
+                          row_gap = unit(3, "mm"))
 }
