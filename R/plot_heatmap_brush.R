@@ -1,3 +1,4 @@
+#' @rdname plot_heatmap
 plot_heatmap_brush <- function(Z, g1, g2, col_names) {
   both_groups <- intersect(g1, g2)
   just_g1 <- g1[-pmatch(g1, g2, nomatch=0)]
@@ -14,5 +15,5 @@ plot_heatmap_brush <- function(Z, g1, g2, col_names) {
                           show_row_dend=FALSE,
                           show_column_dend=FALSE, show_column_names=FALSE,
                           show_heatmap_legend=FALSE,
-                          row_gap = unit(3, "mm"))
+                          row_gap = grid::unit(3, "mm"))
 }

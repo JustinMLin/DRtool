@@ -9,10 +9,8 @@
 #' @param cluster A vector of length `nrow(projected_pts)` containing the
 #' cluster labels.
 #' @param id A numerical vector containing the labels of the points.
-#' @param g1 A numerical vector containing the indices of the points in group
-#' one.
-#' @param g2 A numerical vector containing the indices of the points in group
-#' two.
+#' @param g1,g2 A numerical vector containing the indices of the points in each
+#' group.
 #' @param projected_pts A numerical matrix with two columns.
 #' @param ids A numerical vector containing the indices of the projected points.
 #' @param path_ids A numerical vector containing the indices of the path points.

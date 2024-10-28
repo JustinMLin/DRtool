@@ -1,3 +1,17 @@
+#' Construct the heatmap of high-dimensional points
+#'
+#' Creates a heatmap of the high-dimensional points. The rows are split
+#' according to
+#'  * class for [plot_heatmap()], and
+#'  * user-defined groups for [plot_heatmap_brush()].
+#'
+#' @param Z A numerical matrix containing the high-dimensional data.
+#' @param path A named list returned by `get_shortest_path()`.
+#' @param g1,g2 A numerical vector of the indices of the points each group.
+#' @param cluster A vector of length `nrow(Z)` with cluster labels.
+#' @param col_names A vector of length `col(Z)` with column names.
+#'
+#' @returns A `ComplexHeatmap` object.
 plot_heatmap <- function(Z, path, cluster, col_names) {
   path_ids <- as.numeric(path$vpath)
 
@@ -22,5 +36,5 @@ plot_heatmap <- function(Z, path, cluster, col_names) {
                           show_row_dend=FALSE,
                           show_column_dend=FALSE, show_column_names=FALSE,
                           show_heatmap_legend=FALSE,
-                          row_gap = unit(3, "mm"))
+                          row_gap = grid::unit(3, "mm"))
 }

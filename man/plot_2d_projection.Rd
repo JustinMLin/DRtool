@@ -65,11 +65,8 @@ highlighted in the plot. If \code{slider = 0}, no segment will be highlighted.}
 \item{show_all_edges}{"Show" or "Hide". If "Show", all edges of the minimum
 spanning tree will be drawn.}
 
-\item{g1}{A numerical vector containing the indices of the points in group
-one.}
-
-\item{g2}{A numerical vector containing the indices of the points in group
-two.}
+\item{g1, g2}{A numerical vector containing the indices of the points in each
+group.}
 
 \item{color_choice}{"Original Coloring" or "Group Coloring". Determines if
 the colors of the projected points are returned or if they're colored

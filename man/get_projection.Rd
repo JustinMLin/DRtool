@@ -20,9 +20,7 @@ get_projection_brush(Z, path, g1, g2, cluster, dim, degree)
 
 \item{degree}{A positive numeric.}
 
-\item{g1}{A numerical vector of the indices of the points in group one.}
-
-\item{g2}{A numerical vector of the indices of the points in group two.}
+\item{g1, g2}{A numerical vector of the indices of the points each group.}
 }
 \value{
 A list with the following components:
