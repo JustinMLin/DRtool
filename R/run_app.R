@@ -4,6 +4,9 @@ run_app <- function(Z, X, cluster, id=NULL) {
   Z_dist <- unname(dist(Z))
   X <- unname(X)
 
+  ht = Heatmap(mtcars)
+  ht = draw(ht)
+
   if (is.null(id)) {id <- 1:nrow(X)}
 
   tree <- get_mst(Z_dist)
@@ -61,10 +64,10 @@ run_app <- function(Z, X, cluster, id=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("Heatmap", shiny::plotOutput("heatmap")),
+          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput(heatmap_id="heatmap")),
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
           bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
-        )
+        ),
       )
     ),
 
@@ -135,7 +138,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
     )
   )
 
-  server <- function(input, output) {
+  server <- function(input, output, session) {
     shortest_path <- shiny::reactive({
       if (input$from == input$to) return(NULL)
 
@@ -188,11 +191,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
       }
     })
 
-    output$heatmap <- shiny::renderPlot({
-      tryCatch({
-        plot_heatmap(Z, shortest_path(), cluster)
-      }, error = function(e) {})
-    })
+    InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, heatmap_id="heatmap")
 
     output$projPath <- plotly::renderPlotly({
       if (is.null(projected_pts())) {
