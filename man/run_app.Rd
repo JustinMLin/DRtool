@@ -33,7 +33,7 @@ Z3 <- mvrnorm(n=30, mu=c(0,0,2,0,0), Sigma=diag(rep(1,5)))
 Z <- rbind(Z1, Z2, Z3)
 
 # compute low-dimensional embedding using t-SNE
-X <- Rtsne(Z, dims=2, perplexity=30)$Y
+X <- Rtsne(Z, dims=2, perplexity=20)$Y
 
 # compute k-means clustering
 cluster <- kmeans(Z, centers=3, nstart=10)$cluster

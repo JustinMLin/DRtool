@@ -7,17 +7,13 @@
 get_medoids(Z_dist, cluster)
 }
 \arguments{
-\item{A}{vector of length \code{nrow(as.matrix(dist))}.}
+\item{Z_dist}{A \code{dist} object or numerical distance matrix.}
+
+\item{cluster}{A vector of length \code{nrow(as.matrix(dist))}.}
 }
 \value{
 A numerical vector of medoid indices.
 }
 \description{
 Returns the indices of the medoid of each cluster in the data set.
-}
-\examples{
-Z <- matrix(rnorm(20), nrow=5, ncol=4)
-Z_dist <- dist(Z)
-cluster <- c(1,1,2,2,2)
-get_medoids(Z_dist, cluster)
 }

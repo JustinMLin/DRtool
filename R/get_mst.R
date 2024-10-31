@@ -7,11 +7,6 @@
 #' @param Z_dist A `dist` object or a distance matrix.
 #'
 #' @returns An `igraph` object.
-#'
-#' @examples
-#' Z <- matrix(rnorm(40, nrow=10, ncol=4))
-#' Z_dist = dist(Z)
-#' get_mst(Z_dist)
 get_mst <- function(Z_dist) {
   Z_dist <- as.matrix(Z_dist)
 

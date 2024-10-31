@@ -8,11 +8,6 @@
 #' medoid of.
 #'
 #' @returns A numeric.
-#'
-#' @examples
-#' X <- matrix(rnorm(40), nrow=10, ncol=4)
-#' g <- c(1,2,3)
-#' get_medoid(dist(X), g)
 get_medoid <- function(X_dist, g) {
   if (length(g) == 0) stop("get_medoid: cluster does not exist!")
 

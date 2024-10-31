@@ -14,7 +14,7 @@ coordinates of the points in the plot.}
 
 \item{Z_dist}{A \code{dist} object or numerical distance matrix.}
 
-\item{An}{\code{igraph} object.}
+\item{tree}{An \code{igraph} object.}
 }
 \value{
 A \code{ggplot} object.

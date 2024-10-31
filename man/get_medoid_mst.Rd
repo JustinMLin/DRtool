@@ -22,10 +22,3 @@ this attribute is NA.
 Uses \code{\link[=get_medoids]{get_medoids()}} to calculate cluster medoids, then uses \code{\link[=get_subtree]{get_subtree()}}
 to get the minimal subtree.
 }
-\examples{
-Z <- matrix(rnorm(20), nrow=5, ncol=4)
-Z_dist <- dist(Z)
-mst = get_mst(Z_dist)
-cluster <- c(1,1,2,2,2)
-get_medoid_mst(Z_dist, mst, cluster)
-}

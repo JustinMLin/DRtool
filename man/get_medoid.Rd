@@ -19,8 +19,3 @@ A numeric.
 \code{get_medoid()} returns the index of the medoid of the cluster of points
 given by \code{g}.
 }
-\examples{
-X <- matrix(rnorm(40), nrow=10, ncol=4)
-g <- c(1,2,3)
-get_medoid(dist(X), g)
-}

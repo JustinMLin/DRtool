@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_medoid_mst.R
 \name{get_subtree}
 \alias{get_subtree}
-\title{Get the minimum subtree comtaioning the specified vertices}
+\title{Get the minimum subtree containing the specified vertices}
 \usage{
 get_subtree(tree, points)
 }
@@ -17,8 +17,4 @@ An \code{igraph} object.
 \description{
 The subtree contains all of the specified vertices along with the shortest
 paths between each pair of them. Uses \code{\link[igraph:subgraph]{igraph::induced_subgraph()}}.
-}
-\examples{
-tree <- make_tree(10, 3, mode="undirected")
-get_subtree(tree, c(1,2,3))
 }

@@ -17,8 +17,3 @@ Returns an \code{igraph} object containing the minimum spanning tree. Constructs
 graph using \code{\link[igraph:graph_from_adjacency_matrix]{igraph::graph_from_adjacency_matrix()}}, then calculates the minimum
 spanning tree using \code{\link[igraph:mst]{igraph::mst()}}.
 }
-\examples{
-Z <- matrix(rnorm(40, nrow=10, ncol=4))
-Z_dist = dist(Z)
-get_mst(Z_dist)
-}

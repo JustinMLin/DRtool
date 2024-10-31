@@ -26,6 +26,9 @@ Imports:
     stringr,
     ComplexHeatmap,
     InteractiveComplexHeatmap
+Suggests:
+    MASS,
+    Rtsne
 Remotes:
     jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap
