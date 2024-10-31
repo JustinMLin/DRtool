@@ -12,10 +12,10 @@ add_path(plot, df, path, slider = 0)
 \item{df}{A data frame containing columns named \code{x} and \code{y} containing the
 coordinates of the points in the plot.}
 
+\item{path}{A named list returned by \code{get_shortest_path()}.}
+
 \item{slider}{A non-negative numeric denoting which segment in the path to
 highlight. If \code{slider = 0}, no segment will be highlighted.}
-
-\item{A}{named list returned by \code{get_shortest_path()}.}
 }
 \value{
 A \code{ggplot} object.
