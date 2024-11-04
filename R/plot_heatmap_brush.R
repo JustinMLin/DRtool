@@ -9,7 +9,16 @@ plot_heatmap_brush <- function(Z, g1, g2, col_names) {
                                                        length(both_groups),
                                                        length(just_g2))),
                   levels=c("Group 1", "Both", "Group 2"))
+
+  hcr = hclust(dist(t(pts)))
+  ddr = as.dendrogram(hcr)
+
+  if (length(just_g1) > 0 & length(just_g2) > 0) {
+    ddr = reorder(ddr, colMeans(Z[just_g1,]) - colMeans(Z[just_g2,]))
+  }
+
   ComplexHeatmap::Heatmap(pts, row_split=group,
+                          cluster_columns = ddr,
                           column_labels = col_names,
                           cluster_row_slices=FALSE,
                           show_row_dend=FALSE,

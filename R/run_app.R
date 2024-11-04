@@ -302,7 +302,7 @@ run_app <- function(Z, X, cluster, id=NULL) {
     })
 
     ht_brush <- shiny::reactive({
-      if (is.null(shortest_path_brush())) NULL
+      if (is.null(rv$g1) | is.null(rv$g2)) NULL
       else {
         plot_heatmap_brush(Z, rv$g1, rv$g2, col_names)
       }

@@ -31,7 +31,15 @@ plot_heatmap <- function(Z, path, cluster, col_names) {
 
   pts <- Z[ids,]
 
+  hcr <- hclust(dist(t(pts)))
+  ddr <- as.dendrogram(hcr)
+
+  if (first_label != last_label) {
+    ddr <- reorder(ddr, colMeans(Z[first_ids,]) - colMeans(Z[last_ids,]))
+  }
+
   ComplexHeatmap::Heatmap(pts, row_split=group,
+                          cluster_columns = ddr,
                           column_labels = col_names,
                           show_row_dend=FALSE,
                           show_column_dend=FALSE, show_column_names=FALSE,
