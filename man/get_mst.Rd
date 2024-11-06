@@ -7,7 +7,7 @@
 get_mst(Z_dist)
 }
 \arguments{
-\item{Z_dist}{A \code{dist} object or a distance matrix.}
+\item{Z_dist}{A \code{dist} object or distance matrix.}
 }
 \value{
 An \code{igraph} object.

@@ -27,9 +27,12 @@ Imports:
     ComplexHeatmap,
     InteractiveComplexHeatmap
 Suggests:
+    knitr,
     MASS,
+    rmarkdown,
     Rtsne
 Remotes:
     jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap
 LazyData: true
+VignetteBuilder: knitr

@@ -1,0 +1,98 @@
+---
+title: "DRtool"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DRtool}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette provides an example of the DRtool workflow from start to finish,
+including preparing the data and using the tool. We will use the MNIST data set
+available in [dslabs](https://cran.r-project.org/web/packages/dslabs/index.html),
+as well as an implementation of UMAP available in
+[umap](https://cran.r-project.org/web/packages/umap/index.html). This package
+implements the UMAP algorithm in both R and Python. The Python implementation
+is more efficient, but requires a Python installation setup with
+[reticulate](https://cran.r-project.org/web/packages/reticulate/index.html) and
+the Python package [umap-learn](https://umap-learn.readthedocs.io/en/latest/).
+
+## Preparing the data
+
+We start by importing the data. The imported data contains 70,000 images
+partitioned into a training set and a test set containing 60,000 and 10,000
+images, respectively. Each image is a 28 x 28 pixel image of a handwritten
+digit. When vectorized, each image is represented by a 784-dimensional vector.
+Since we are not performing cross-validation, we may disregard the test set. For
+sake of computation, we randomly sample 2,000 images from the training set.
+
+```{r import data}
+library(dslabs)
+
+import <- read_mnist()
+images <- import$train$images
+labels <- import$train$labels
+
+subsample <- sample(1:length(labels), 2000)
+
+Z <- images[subsample,]
+true_labels <- labels[subsample]
+```
+
+In line with the typial UMAP workflow, we apply a PCA pre-processing step. This
+step will begin the de-noising process and speed up the UMAP computation.
+
+```{r PCA pre-processing}
+Z_pca <- unname(prcomp(Z, rank. = 300)$x)
+```
+
+## Creating the low-dimensional embedding
+
+Note, this step is highly specialized to the data being studied. We provide an
+example of this process, but analysts should carefully consider how to construct
+a low-dimensional embedding of their own data.
+
+To create the low-dimensional embedding, we apply UMAP using the implementation
+in [umap](https://cran.r-project.org/web/packages/umap/index.html). The Python
+implementation provided by the package is recommend for its efficiency, but it
+requires a Python installation setup with
+[reticulate](https://cran.r-project.org/web/packages/reticulate/index.html) and
+the Python package [umap-learn](https://umap-learn.readthedocs.io/en/latest/).
+For ease of reproducibility, we resort to the provided R implementation.
+
+```{r low-dimensional embedding}
+library(umap)
+
+X <- umap(Z_pca, method="naive", n_neighbors=30)$layout
+```
+
+## Running the tool
+
+To run the tool, the required inputs are the high-dimensional data,
+low-dimensional embedding, and cluster labels. We also supply the indices of the
+randomly sampled images to serve as IDs. Optionally, the user may also provide
+a dist object or distance matrix for the high-dimensional data. By default,
+the distance matrix is calculated using Euclidean distance. This matrix is used
+in the construction of the minimum spanning tree.
+
+```{r run tool, eval=FALSE}
+library(DRtool)
+
+run_app(Z=Z, X=X, cluster=true_labels, id=subsample)
+```
+
+In practice, the true class labels might not be available. To replicated this
+situation, we can run the tool using a calculated k-means clustering.
+
+```{r run tool kmeans, eval=FALSE}
+kmeans_cluster = kmeans(Z_pca, centers=10, iter.max=100, nstart=20)$cluster
+
+run_app(Z=Z, X=X, cluster=kmeans_labels, id=subsample)
+```

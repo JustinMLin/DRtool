@@ -8,6 +8,9 @@
 #' @param X A numerical matrix satisfying `nrow(X) = nrow(Z)` and
 #' `ncol(X) = 2`.
 #' @param cluster A numerical vector or factor of length `nrow(Z)`.
+#' @param Z_dist A `dist` object or distance matrix. The distance matrix for the
+#' high-dimensional data. By default, a distance matrix calculating using
+#' Euclidean distance. Used when computing the minimum spanning tree.
 #' @param id A vector of length `nrow(Z)`. If `id = NULL`, the ids will be set
 #' to the indices of the points.
 #'
@@ -31,7 +34,7 @@
 #' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, id=NULL) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
     stop("Z and X must be matrices.")
   }
@@ -49,8 +52,6 @@ run_app <- function(Z, X, cluster, id=NULL) {
   col_names <- colnames(Z)
   Z <- unname(Z)
   X <- unname(X)
-
-  Z_dist = dist(Z)
 
   if (is.null(id)) {id <- 1:nrow(X)}
 

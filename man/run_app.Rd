@@ -4,7 +4,7 @@
 \alias{run_app}
 \title{Launch the dimension reduction tool}
 \usage{
-run_app(Z, X, cluster, id = NULL)
+run_app(Z, X, cluster, Z_dist = dist(Z), id = NULL)
 }
 \arguments{
 \item{Z}{A numerical matrix. The high-dimensional data.}
@@ -13,6 +13,10 @@ run_app(Z, X, cluster, id = NULL)
 \code{ncol(X) = 2}.}
 
 \item{cluster}{A numerical vector or factor of length \code{nrow(Z)}.}
+
+\item{Z_dist}{A \code{dist} object or distance matrix. The distance matrix for the
+high-dimensional data. By default, a distance matrix calculating using
+Euclidean distance. Used when computing the minimum spanning tree.}
 
 \item{id}{A vector of length \code{nrow(Z)}. If \code{id = NULL}, the ids will be set
 to the indices of the points.}
