@@ -13,6 +13,9 @@
 #' Euclidean distance. Used when computing the minimum spanning tree.
 #' @param id A vector of length `nrow(Z)`. If `id = NULL`, the ids will be set
 #' to the indices of the points.
+#' @param col_names A vector of length `nrow(Z)`. The column names will be used
+#' when viewing sub-heatmaps. If `col_names = NULL`, the column names will be
+#' pulled from `Z`.
 #'
 #' @examples
 #' library(MASS)
@@ -34,7 +37,7 @@
 #' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
     stop("Z and X must be matrices.")
   }
@@ -44,12 +47,14 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL) {
   if (length(cluster) != nrow(Z)) {
     stop("The length of cluster must be equal to the number of rows of Z and X.")
   }
-
   if (!is.null(id) & length(id) != nrow(Z)) {
     stop("The length of id must be equal to the number of rows of Z and X.")
   }
+  if(!is.null(col_names) & length(col_names) != nrow(Z)) {
+    stop("The length of col_names must be equal to the number of rows of Z and X.")
+  }
 
-  col_names <- colnames(Z)
+  col_names <- if(is.null(col_names)) colnames(Z) else col_names
   Z <- unname(Z)
   X <- unname(X)
 
@@ -105,14 +110,14 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL) {
 
         bslib::card(
           bslib::card_header("Low-Dimensional Embedding"),
-          plotly::plotlyOutput("lowDimPlot")
+          plotly::plotlyOutput("lowDimPlot", width=800, height=400)
         ),
 
         bslib::navset_card_underline(
           title="Analytical Plots",
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath")),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights"))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
+          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights", width=800, height=400))
         ),
       )
     ),
@@ -171,14 +176,14 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL) {
 
         bslib::card(
           bslib::card_header("Low-Dimensional Embedding"),
-          plotly::plotlyOutput("lowDimPlot_brush")
+          plotly::plotlyOutput("lowDimPlot_brush", width=800, height=400)
         ),
 
         bslib::navset_card_underline(
           title="Analytical Plots",
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush")),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush"))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400)),
+          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush", width=800, height=400))
         )
       )
     )
