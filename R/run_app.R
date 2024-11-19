@@ -116,8 +116,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
         bslib::navset_card_underline(
           title="Analytical Plots",
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights", width=800, height=400))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400))
         ),
       )
     ),
@@ -182,8 +181,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
         bslib::navset_card_underline(
           title="Analytical Plots",
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400)),
-          bslib::nav_panel("Path Weights", shiny::plotOutput("pathWeights_brush", width=800, height=400))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400))
         )
       )
     )
@@ -274,14 +272,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
                                 x=1, y=1,
                                 showarrow = FALSE) %>%
         plotly::layout(showlegend = FALSE)
-    })
-
-    output$pathWeights <- shiny::renderPlot({
-      if (is.null(shortest_path())) {
-        return(plotly::plotly_empty(type="bar"))
-      }
-
-      plot_path_weights(shortest_path(), input$slider, max_length)
     })
 
     ###########################################################################
@@ -439,14 +429,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
                                 showarrow = FALSE) %>%
         plotly:: layout(legend=list(title=list(text="Group"))) %>%
         {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
-    })
-
-    output$pathWeights_brush <- shiny::renderPlot({
-      if (is.null(shortest_path_brush())) {
-        return(plotly::plotly_empty(type="bar"))
-      }
-
-      plot_path_weights(shortest_path_brush(), input$slider_brush, max_length)
     })
   }
 
