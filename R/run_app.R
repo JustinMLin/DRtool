@@ -13,6 +13,8 @@
 #' Euclidean distance. Used when computing the minimum spanning tree.
 #' @param id A vector of length `nrow(Z)`. If `id = NULL`, the ids will be set
 #' to the indices of the points.
+#' @param meta_data A data frame with a number of rows equal to `nrow(Z)`. For
+#' presenting extra meta data.
 #' @param col_names A vector of length `nrow(Z)`. The column names will be used
 #' when viewing sub-heatmaps. If `col_names = NULL`, the column names will be
 #' pulled from `Z`.
@@ -37,7 +39,7 @@
 #' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame(), col_names=NULL) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
     stop("Z and X must be matrices.")
   }
@@ -115,11 +117,16 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400))
+          bslib::nav_panel("Meta Data",
+                           shiny::uiOutput("metaDataButton"),
+                           shiny::plotOutput("metaData", width=800, height=400))
         ),
       )
     ),
+
+    ###########################################################################
 
     bslib::nav_panel(
       title="Custom Clusters",
@@ -180,8 +187,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
 
         bslib::navset_card_underline(
           title="Analytical Plots",
-          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
-          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400))
+          bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400)),
+          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush"))
         )
       )
     )
@@ -201,17 +208,11 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
     })
 
     projected_pts <- shiny::reactive({
-      if (is.null(shortest_path())) NULL
-      else {
-        get_projection(Z, shortest_path(), cluster, input$dim, input$degree)
-      }
+      if (is.null(shortest_path())) NULL else get_projection(Z, shortest_path(), cluster, input$dim, input$degree)
     })
 
     ht <- shiny::reactive({
-      if (is.null(shortest_path())) NULL
-      else {
-        plot_heatmap(Z, shortest_path(), cluster, col_names)
-      }
+      if (is.null(shortest_path())) NULL else plot_heatmap(Z, shortest_path(), cluster, col_names)
     })
 
     output$slider <- shiny::renderUI({
@@ -247,13 +248,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
       }
     })
 
-    shiny::observe({
-      if (!is.null(ht())) {
-        ht <- ComplexHeatmap::draw(ht())
-        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
-      }
-    })
-
     output$projPath <- plotly::renderPlotly({
       if (is.null(projected_pts())) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
@@ -274,6 +268,26 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
         plotly::layout(showlegend = FALSE)
     })
 
+    shiny::observe({
+      if (!is.null(ht())) {
+        ht <- ComplexHeatmap::draw(ht())
+        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
+      }
+    })
+
+    output$metaDataButton <- shiny::renderUI({
+      choices <- colnames(meta_data)
+
+      shiny::radioButtons("metaDataChoice",
+                          label = "Which feature?",
+                          choices = choices,
+                          inline = TRUE)
+    })
+
+    output$metaData <- shiny::renderPlot({
+      if (is.null(projected_pts())) NULL else meta_data_plot(Z, shortest_path(), cluster, meta_data, input$metaDataChoice)
+    })
+
     ###########################################################################
 
     shortest_path_brush <- shiny::reactive({
@@ -291,17 +305,11 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
     rv <- shiny::reactiveValues(g1 = NULL, g2 = NULL)
 
     projected_pts_brush <- shiny::reactive({
-      if (is.null(shortest_path_brush())) NULL
-      else {
-        get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
-      }
+      if (is.null(shortest_path_brush())) NULL else get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
     })
 
     ht_brush <- shiny::reactive({
-      if (is.null(rv$g1) | is.null(rv$g2)) NULL
-      else {
-        plot_heatmap_brush(Z, rv$g1, rv$g2, col_names)
-      }
+      if (is.null(rv$g1) | is.null(rv$g2)) NULL else plot_heatmap_brush(Z, rv$g1, rv$g2, col_names)
     })
 
     shiny::observeEvent(input$group1, {
@@ -391,13 +399,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
       }
     })
 
-    shiny::observe({
-      if (!is.null(ht_brush())) {
-        ht <- ComplexHeatmap::draw(ht_brush())
-        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap_brush")
-      }
-    })
-
     output$projPath_brush <- plotly::renderPlotly({
       if (is.null(projected_pts_brush())) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
@@ -429,6 +430,13 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, col_names=NULL) {
                                 showarrow = FALSE) %>%
         plotly:: layout(legend=list(title=list(text="Group"))) %>%
         {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
+    })
+
+    shiny::observe({
+      if (!is.null(ht_brush())) {
+        ht <- ComplexHeatmap::draw(ht_brush())
+        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap_brush")
+      }
     })
   }
 
