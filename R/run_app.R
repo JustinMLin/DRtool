@@ -88,8 +88,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
             bslib::accordion_panel(
               "Path Selection",
               style="background-color: #f2f2f2",
-              shiny::numericInput("from", "From ID", value = 0),
-              shiny::numericInput("to", "To ID", value = 0)
+              shiny::numericInput("from", "From ID", min=0, value = 0),
+              shiny::numericInput("to", "To ID", min=0, value = 0)
             ),
             bslib::accordion_panel(
               "Path Projection Settings",
@@ -195,16 +195,13 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
   )
 
   server <- function(input, output, session) {
+
     shortest_path <- shiny::reactive({
+      if(!isTruthy(input$from) | !(input$from %in% id)) return(NULL)
+      if(!isTruthy(input$to) | !(input$to %in% id)) return(NULL)
       if (input$from == input$to) return(NULL)
 
-      sp <- tryCatch({
-        get_shortest_path(tree, which(id == input$from), which(id == input$to))
-      }, error = function(err) {
-        NULL
-      })
-
-      sp
+      get_shortest_path(tree, which(id == input$from), which(id == input$to))
     })
 
     projected_pts <- shiny::reactive({
@@ -212,7 +209,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
     })
 
     ht <- shiny::reactive({
-      if (is.null(shortest_path())) NULL else plot_heatmap(Z, shortest_path(), cluster, col_names)
+      if (is.null(shortest_path())) NULL else suppressMessages(plot_heatmap(Z, shortest_path(), cluster, col_names))
     })
 
     output$slider <- shiny::renderUI({
@@ -269,6 +266,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
     })
 
     shiny::observe({
+      # need to return blank heatmap when ht() is NULL
+
       if (!is.null(ht())) {
         ht <- ComplexHeatmap::draw(ht())
         InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
@@ -291,25 +290,21 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
     ###########################################################################
 
     shortest_path_brush <- shiny::reactive({
-      sp <- tryCatch({
-        get_shortest_path(tree,
-                          which(id == input$from_brush),
-                          which(id == input$to_brush))
-      }, error = function(err) {
-        return(NULL)
-      })
+      if(!isTruthy(input$from_brush) | !(input$from_brush %in% id)) return(NULL)
+      if(!isTruthy(input$to_brush) | !(input$to_brush %in% id)) return(NULL)
+      if (input$from_brush == input$to_brush) return(NULL)
 
-      sp
+      get_shortest_path(tree, which(id == input$from_brush), which(id == input$to_brush))
     })
 
     rv <- shiny::reactiveValues(g1 = NULL, g2 = NULL)
 
     projected_pts_brush <- shiny::reactive({
-      if (is.null(shortest_path_brush())) NULL else get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
+      if (is.null(rv$g1) | is.null(rv$g2) | is.null(shortest_path_brush())) NULL else get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
     })
 
     ht_brush <- shiny::reactive({
-      if (is.null(rv$g1) | is.null(rv$g2)) NULL else plot_heatmap_brush(Z, rv$g1, rv$g2, col_names)
+      if (is.null(rv$g1) | is.null(rv$g2) | is.null(shortest_path_brush())) NULL else suppressMessages(plot_heatmap_brush(Z, rv$g1, rv$g2, col_names))
     })
 
     shiny::observeEvent(input$group1, {
@@ -400,7 +395,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
     })
 
     output$projPath_brush <- plotly::renderPlotly({
-      if (is.null(projected_pts_brush())) {
+      if (is.null(rv$g1) | is.null(rv$g2) | is.null(shortest_path_brush())) {
         return(plotly::plotly_empty(type="scatter", mode="markers"))
       }
 
