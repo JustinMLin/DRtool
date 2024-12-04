@@ -39,7 +39,7 @@
 #' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame(), col_names=NULL) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
     stop("Z and X must be matrices.")
   }
@@ -117,10 +117,11 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
 
         bslib::navset_card_underline(
           title="Analytical Plots",
+          id="analytical_plots",
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
           bslib::nav_panel("Meta Data",
-                           shiny::uiOutput("metaDataButton"),
+                           shiny::uiOutput("metaDataChoice"),
                            shiny::plotOutput("metaData", width=800, height=400))
         ),
       )
@@ -187,8 +188,12 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
 
         bslib::navset_card_underline(
           title="Analytical Plots",
+          id="analytical_plots_brush",
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400)),
-          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush"))
+          bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
+          bslib::nav_panel("Meta Data",
+                           shiny::uiOutput("metaDataButton_brush"),
+                           shiny::plotOutput("metaData_brush", width=800, height=400))
         )
       )
     )
@@ -266,15 +271,15 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
     })
 
     shiny::observe({
-      # need to return blank heatmap when ht() is NULL
-
       if (!is.null(ht())) {
         ht <- ComplexHeatmap::draw(ht())
         InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
       }
     })
 
-    output$metaDataButton <- shiny::renderUI({
+    if (is.null(meta_data)) bslib::nav_remove("analytical_plots", "Meta Data")
+
+    output$metaDataChoice <- shiny::renderUI({
       choices <- colnames(meta_data)
 
       shiny::radioButtons("metaDataChoice",
@@ -432,6 +437,21 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=data.frame
         ht <- ComplexHeatmap::draw(ht_brush())
         InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap_brush")
       }
+    })
+
+    if (is.null(meta_data)) bslib::nav_remove("analytical_plots_brush", "Meta Data")
+
+    output$metaDataButton_brush <- shiny::renderUI({
+      choices <- colnames(meta_data)
+
+      shiny::radioButtons("metaDataChoice_brush",
+                          label = "Which feature?",
+                          choices = choices,
+                          inline = TRUE)
+    })
+
+    output$metaData_brush <- shiny::renderPlot({
+      if (is.null(rv$g1) | is.null(rv$g2)) NULL else meta_data_plot_brush(Z, rv$g1, rv$g2, meta_data, input$metaDataChoice_brush)
     })
   }
 
