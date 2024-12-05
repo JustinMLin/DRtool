@@ -77,7 +77,7 @@ plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, v
 
   p <- ggplot2::ggplot(df) +
     suppressWarnings(ggnetwork::geom_nodes(ggplot2::aes(x=x, y=y, fill=color, label=id), size=0.8, color="transparent", shape=21)) +
-    ggplot2::scale_fill_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(unique(cluster[ids]))]) +
+    ggplot2::scale_fill_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(match(unique(df$color), sort(unique(cluster))))]) +
     ggnetwork::geom_edges(data=df[df$edge_type == "path",],
                           ggplot2::aes(x=x, y=y, xend=xend, yend=yend, color=path_color), linewidth=0.3) +
     ggplot2::scale_color_manual(values=c("black", "red")) +
