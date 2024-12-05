@@ -4,7 +4,15 @@
 \alias{run_app}
 \title{Launch the dimension reduction tool}
 \usage{
-run_app(Z, X, cluster, Z_dist = dist(Z), id = NULL)
+run_app(
+  Z,
+  X,
+  cluster,
+  Z_dist = dist(Z),
+  id = NULL,
+  meta_data = NULL,
+  col_names = NULL
+)
 }
 \arguments{
 \item{Z}{A numerical matrix. The high-dimensional data.}
@@ -20,6 +28,13 @@ Euclidean distance. Used when computing the minimum spanning tree.}
 
 \item{id}{A vector of length \code{nrow(Z)}. If \code{id = NULL}, the ids will be set
 to the indices of the points.}
+
+\item{meta_data}{A data frame with a number of rows equal to \code{nrow(Z)}. For
+presenting extra meta data.}
+
+\item{col_names}{A vector of length \code{nrow(Z)}. The column names will be used
+when viewing sub-heatmaps. If \code{col_names = NULL}, the column names will be
+pulled from \code{Z}.}
 }
 \description{
 Launches the dimension reduction tool. The required inputs are the

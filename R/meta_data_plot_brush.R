@@ -1,3 +1,4 @@
+#' @rdname meta_data_plot
 meta_data_plot_brush <- function(Z, g1, g2, meta_data, feature) {
   both_groups <- intersect(g1, g2)
   just_g1 <- g1[!(g1 %in% g2)]

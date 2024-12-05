@@ -1,3 +1,17 @@
+#' Plot meta data
+#'
+#' Plots the meta data for the selected groups. Categorical data is plotted
+#' with pie charts, while numerical data is plotted with box plots.
+#'
+#' @param Z A numerical matrix containing the high-dimensional data.
+#' @param path A named list returned by `get_shortest_path()`.
+#' @param g1,g2 A numerical vector of the indices of the points each group.
+#' @param cluster A vector of length `nrow(Z)` with cluster labels.
+#' @param meta_data A data frame with a number of rows equal to `nrow(Z)`. For
+#' presenting extra meta data.
+#' @param feature A string containing the name of the feature to be displayed.
+#'
+#' @returns A `ggplot` or `gtable` object.
 meta_data_plot <- function(Z, path, cluster, meta_data, feature) {
   path_ids <- as.numeric(path$vpath)
   path_pts <- Z[path_ids,]
