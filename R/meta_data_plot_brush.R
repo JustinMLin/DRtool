@@ -20,21 +20,34 @@ meta_data_plot_brush <- function(Z, g1, g2, meta_data, feature) {
     p1 <- ggplot2::ggplot(df[df$group == "Group 1",], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +
       ggplot2::coord_polar(theta="y", start=0) +
+      ggplot2::scale_fill_manual(limits=unique(df$data),
+                                 values=scales::hue_pal()(length(unique(df$data))),
+                                 drop=FALSE) +
       ggplot2::theme_void() +
       ggplot2::labs(title="Group 1", fill=feature)
 
-    p2 <- ggplot2::ggplot(df[df$group == "Both Groups",], ggplot2::aes(x=factor(1), fill=data)) +
+    p2 <- ggplot2::ggplot(df[df$group == "Group 2",], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +
       ggplot2::coord_polar(theta="y", start=0) +
-      ggplot2::theme_void() +
-      ggplot2::labs(title="Both Groups", fill=feature)
-
-    p3 <- ggplot2::ggplot(df[df$group == "Group 2",], ggplot2::aes(x=factor(1), fill=data)) +
-      ggplot2::geom_bar(stat="count", width=1, color="white") +
-      ggplot2::coord_polar(theta="y", start=0) +
+      ggplot2::scale_fill_manual(limits=unique(df$data),
+                                 values=scales::hue_pal()(length(unique(df$data))),
+                                 drop=FALSE) +
       ggplot2::theme_void() +
       ggplot2::labs(title="Group 2", fill=feature)
 
-    gridExtra::grid.arrange(p1, p2, p3, nrow=1)
+    if (length(both_groups != 0)) {
+      p3 <- ggplot2::ggplot(df[df$group == "Both Groups",], ggplot2::aes(x=factor(1), fill=data)) +
+        ggplot2::geom_bar(stat="count", width=1, color="white") +
+        ggplot2::coord_polar(theta="y", start=0) +
+        ggplot2::scale_fill_manual(limits=unique(df$data),
+                                   values=scales::hue_pal()(length(unique(df$data))),
+                                   drop=FALSE) +
+        ggplot2::theme_void() +
+        ggplot2::labs(title="Both Groups", fill=feature)
+
+      return(gridExtra::grid.arrange(p1, p3, p2, nrow=1))
+    }
+
+    gridExtra::grid.arrange(p1, p2, nrow=1)
   }
 }

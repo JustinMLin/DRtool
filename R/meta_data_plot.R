@@ -34,12 +34,18 @@ meta_data_plot <- function(Z, path, cluster, meta_data, feature) {
     p1 <- ggplot2::ggplot(df[df$group == 1,], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +
       ggplot2::coord_polar(theta="y", start=0) +
+      ggplot2::scale_fill_manual(limits=unique(df$data),
+                                 values=scales::hue_pal()(length(unique(df$data))),
+                                 drop=FALSE) +
       ggplot2::theme_void() +
       ggplot2::labs(title="Group 1", fill=feature)
 
     p2 <- ggplot2::ggplot(df[df$group == 2,], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +
       ggplot2::coord_polar(theta="y", start=0) +
+      ggplot2::scale_fill_manual(limits=unique(df$data),
+                                 values=scales::hue_pal()(length(unique(df$data))),
+                                 drop=FALSE) +
       ggplot2::theme_void() +
       ggplot2::labs(title="Group 2", fill=feature)
 
