@@ -24,6 +24,7 @@ Imports:
     CCA,
     dplyr,
     ggnetwork,
+    gghighlight,
     stringr,
     ComplexHeatmap,
     InteractiveComplexHeatmap

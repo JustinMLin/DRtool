@@ -119,6 +119,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
           title="Analytical Plots",
           id="analytical_plots",
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
+          bslib::nav_panel("MST Test", shiny::plotOutput("mstTEST", width=800, height=400)),
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
           bslib::nav_panel("Meta Data",
                            shiny::uiOutput("metaDataChoice"),
@@ -268,6 +269,10 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
                                 x=1, y=1,
                                 showarrow = FALSE) %>%
         plotly::layout(showlegend = FALSE)
+    })
+
+    output$mstTEST <- shiny::renderPlot({
+      if (is.null(shortest_path())) NULL else plot_mst_test(tree, shortest_path(), cluster, dim(Z)[2])
     })
 
     shiny::observe({
