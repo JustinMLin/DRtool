@@ -272,7 +272,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     })
 
     output$mstTEST <- shiny::renderPlot({
-      if (is.null(shortest_path())) NULL else plot_mst_test(tree, shortest_path(), cluster, dim(Z)[2])
+      if (is.null(shortest_path())) NULL else plot_mst_test2(Z, shortest_path(), cluster)
     })
 
     shiny::observe({
