@@ -77,6 +77,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     theme=bslib::bs_theme(bootswatch="cosmo"),
     fillable=FALSE,
     bslib::nav_panel(
+      shinyjs::useShinyjs(),
       title="Default Clusters",
 
       bslib::layout_sidebar(
@@ -96,11 +97,18 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
               style="background-color: #f2f2f2",
               shiny::numericInput("dim", "Dimension", min=2, max=dim(Z)[2], value=2, step=1),
               shiny::sliderInput("degree", "CCA Degree", min=2, max=10, value=2, step=1),
-              shiny::sliderInput("adjust", "Bandwidth Adjustment", min=0, max=5, value = 0, step = .05),
+              shiny::sliderInput("adjust", "Bandwidth Adjustment", min=0, max=5, value=0, step = .05),
               shiny::radioButtons("show_all_edges",
                                   label = "Show all MST edges?",
                                   choices = c("Hide", "Show"),
                                   inline = TRUE)
+            ),
+            bslib::accordion_panel(
+              "MST Test Settings",
+              style="background-color: #f2f2f2",
+              shiny::numericInput("num_sim", "Number of Simulations", min=50, 500, value=100, step=50),
+              shiny::actionButton("bootstrap",
+                                  label="Run test")
             )
           ),
           shiny::radioButtons("med_subtree1",
@@ -119,7 +127,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
           title="Analytical Plots",
           id="analytical_plots",
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath", width=800, height=400)),
-          bslib::nav_panel("MST Test", shiny::plotOutput("mstTEST", width=800, height=400)),
+          bslib::nav_panel("MST Test", shiny::verbatimTextOutput("MSTtest")),
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap")),
           bslib::nav_panel("Meta Data",
                            shiny::uiOutput("metaDataChoice"),
@@ -202,6 +210,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
   server <- function(input, output, session) {
 
+    mst_test_vals <- shiny::reactiveValues(from=NULL, to=NULL, sim_crossings=NULL, num_crossings=NULL, same=NULL)
+
     shortest_path <- shiny::reactive({
       if(!isTruthy(input$from) | !(input$from %in% id)) return(NULL)
       if(!isTruthy(input$to) | !(input$to %in% id)) return(NULL)
@@ -271,8 +281,28 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         plotly::layout(showlegend = FALSE)
     })
 
-    output$mstTEST <- shiny::renderPlot({
-      if (is.null(shortest_path())) NULL else plot_mst_test2(Z, shortest_path(), cluster)
+    shiny::observeEvent(input$bootstrap, {
+      if (is.null(shortest_path())) {
+        mst_test_vals$from <- NULL
+        mst_test_vals$to <- NULL
+        mst_test_vals$sim_crossings <- NULL
+        mst_test_vals$num_crossings <- NULL
+        mst_test_vals$same <- NULL
+      } else {
+        endpts <- get_path_endpts(shortest_path(), cluster, id)
+        mst_test_vals$from <- endpts$from
+        mst_test_vals$to <- endpts$to
+        mst_test_vals$same <- endpts$same
+        mst_test_vals$sim_crossings <- sim_crossings(Z, shortest_path(), cluster, input$num_sim)
+        mst_test_vals$num_crossings <- count_crossings(Z, shortest_path(), cluster)
+      }
+    })
+
+    output$MSTtest <- shiny::renderPrint({
+      if (is.null(mst_test_vals$sim_crossings)) "Select path and click Run Test!"
+      else {
+        mst_test(mst_test_vals$sim_crossings, mst_test_vals$num_crossings, mst_test_vals$from, mst_test_vals$to)
+      }
     })
 
     shiny::observe({
