@@ -27,7 +27,8 @@ Imports:
     gghighlight,
     stringr,
     ComplexHeatmap,
-    InteractiveComplexHeatmap
+    InteractiveComplexHeatmap,
+    MASS
 Suggests:
     knitr,
     MASS,

@@ -107,8 +107,11 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
               "MST Test Settings",
               style="background-color: #f2f2f2",
               shiny::numericInput("num_sim", "Number of Simulations", min=50, 500, value=100, step=50),
-              shiny::actionButton("bootstrap",
-                                  label="Run test")
+              shiny::actionButton("bootstrap", "Run Test",
+                                  style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px")
             )
           ),
           shiny::radioButtons("med_subtree1",
@@ -181,6 +184,16 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
                            label="Path Projection Coloring",
                            choices=c("Original Coloring", "Group Coloring"),
                            selected="Original Coloring")
+            ),
+            bslib::accordion_panel(
+              "MST Test Settings",
+              style="background-color: #f2f2f2",
+              shiny::numericInput("num_sim_brush", "Number of Simulations", min=50, 500, value=100, step=50),
+              shiny::actionButton("bootstrap_brush", "Run Test",
+                           style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px")
             )
           ),
           shiny::radioButtons("med_subtree2",
@@ -199,6 +212,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
           title="Analytical Plots",
           id="analytical_plots_brush",
           bslib::nav_panel("2D Path Projection", plotly::plotlyOutput("projPath_brush", width=800, height=400)),
+          bslib::nav_panel("MST Test", shiny::verbatimTextOutput("MSTtest_brush")),
           bslib::nav_panel("Heatmap", InteractiveComplexHeatmap::InteractiveComplexHeatmapOutput("heatmap_brush")),
           bslib::nav_panel("Meta Data",
                            shiny::uiOutput("metaDataButton_brush"),
@@ -301,7 +315,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     output$MSTtest <- shiny::renderPrint({
       if (is.null(mst_test_vals$sim_crossings)) "Select path and click Run Test!"
       else {
-        mst_test(mst_test_vals$sim_crossings, mst_test_vals$num_crossings, mst_test_vals$from, mst_test_vals$to)
+        mst_test(mst_test_vals$sim_crossings, mst_test_vals$num_crossings, mst_test_vals$from, mst_test_vals$to, mst_test_vals$same)
       }
     })
 
@@ -338,6 +352,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     })
 
     rv <- shiny::reactiveValues(g1 = NULL, g2 = NULL)
+
+    mst_test_vals_brush <- shiny::reactiveValues(g1=NULL, g2=NULL, sim_crossings=NULL, num_crossings=NULL)
 
     projected_pts_brush <- shiny::reactive({
       if (is.null(rv$g1) | is.null(rv$g2) | is.null(shortest_path_brush())) NULL else get_projection_brush(Z, shortest_path_brush(), rv$g1, rv$g2, cluster, input$dim_brush, input$degree_brush)
@@ -465,6 +481,29 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
                                 showarrow = FALSE) %>%
         plotly:: layout(legend=list(title=list(text="Group"))) %>%
         {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
+    })
+
+    shiny::observeEvent(input$bootstrap_brush, {
+      if (is.null(rv$g1) | is.null(rv$g2)) {
+        mst_test_vals_brush$g1 <- NULL
+        mst_test_vals_brush$g2 <- NULL
+        mst_test_vals_brush$sim_crossings <- NULL
+        mst_test_vals_brush$num_crossings <- NULL
+      } else {
+        mst_test_vals_brush$g1 <- rv$g1
+        mst_test_vals_brush$g2 <- rv$g2
+        mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush)
+        mst_test_vals_brush$num_crossings <- count_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster)
+      }
+    })
+
+    output$MSTtest_brush <- shiny::renderPrint({
+      if (is.null(mst_test_vals_brush$sim_crossings)) "Select groups and click Run Test!"
+      else if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) != 0) "To run the MST test, the groups cannot share samples!"
+      else if (!identical(rv$g1, mst_test_vals_brush$g1) | !identical(rv$g2, mst_test_vals_brush$g2)) "Groups have changed. Please re-run the test!"
+      else {
+        mst_test_brush(mst_test_vals_brush$sim_crossings, mst_test_vals_brush$num_crossings)
+      }
     })
 
     shiny::observe({

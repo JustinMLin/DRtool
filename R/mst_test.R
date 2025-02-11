@@ -1,8 +1,6 @@
 count_crossings <- function(Z, path, cluster) {
   path_ids <- as.numeric(path$vpath)
 
-  first_pt = path_ids[1]
-
   first_label <- cluster[path_ids[1]]
   last_label <- cluster[path_ids[length(path_ids)]]
 
@@ -46,6 +44,8 @@ sim_crossings <- function(Z, path, cluster, b) {
       X <- cbind(X, matrix(runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2), ncol=1))
     }
 
+    # X <- MASS::mvrnorm(n, mu=rep(0, p), Sigma=diag(var_ratio))
+
     mst <- get_mst(dist(X))
 
     count <- 0
@@ -70,7 +70,7 @@ get_path_endpts <- function(path, cluster, id) {
   list(from=id[path_ids[1]], to=id[path_ids[length(path_ids)]], same=same)
 }
 
-mst_test <- function(sim_crossings, num_crossings, from, to, same=FALSE) {
+mst_test <- function(sim_crossings, num_crossings, from, to, same) {
   if (same) print("Endpoints must belong to different classes! Use the Custom Clusters tab for custom clusters.")
   else {
     p_val <- mean(sim_crossings < num_crossings)
