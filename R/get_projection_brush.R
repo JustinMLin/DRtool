@@ -20,8 +20,7 @@ get_projection_brush <- function(Z, path, g1, g2, cluster, dim, degree) {
     projected_pts = predict(proj_pca, pts)
   } else {
     invisible(capture.output(lambda <- CCA::estim.regul(X[1:length(path_ids),], ref_mat,
-                                                        grid1=10^(-2:2), grid2=c(0),
-                                                        plt=FALSE)$lambda1))
+                                                        grid1=10^(-3:2), plt=FALSE)$lambda1))
     cc1 <- CCA::rcc(X[1:length(path_ids),], ref_mat, lambda, 0)
     projected_pts = X %*% cc1$xcoef
   }

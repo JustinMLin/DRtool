@@ -1,16 +1,27 @@
-count_crossings_brush <- function(Z, g1, g2, cluster) {
-  Z1 <- Z[c(g1, g2),]
+count_crossings_brush <- function(mst, g1, g2) {
+  cluster = rep(3, igraph::vcount(mst))
+  cluster[g1] = 1
+  cluster[g2] = 2
 
-  mst <- get_mst(dist(Z1))
-
-  new_cluster <- cluster[c(g1, g2)]
+  simp_mst <- simplify_sub_mst(mst, g1, g2, cluster)
 
   count <- 0
-  for (i in 1:igraph::ecount(mst)) {
-    head_label <- new_cluster[igraph::head_of(mst, i)]
-    tail_label <- new_cluster[igraph::tail_of(mst, i)]
+  for (i in 1:igraph::ecount(simp_mst)) {
+    head <- igraph::head_of(simp_mst, i)
+    tail <- igraph::tail_of(simp_mst, i)
 
-    if (head_label != tail_label) count <- count + 1
+    head_label <- V(simp_mst)$cluster[head]
+    tail_label <- V(simp_mst)$cluster[tail]
+
+    if (setequal(c(head_label, tail_label), c(1,2))) count <- count + 1
+  }
+
+  for (node in which(V(simp_mst)$group == "outside")) {
+    neighbors <- igraph::neighbors(simp_mst, node)
+    g1_neighbors <- sum(V(simp_mst)$group[neighbors] == "g1")
+    g2_neighbors <- sum(V(simp_mst)$group[neighbors] == "g2")
+
+    count <- count + min(g1_neighbors, g2_neighbors)
   }
 
   count

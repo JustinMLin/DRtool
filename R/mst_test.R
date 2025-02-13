@@ -1,21 +1,31 @@
-count_crossings <- function(Z, path, cluster) {
+count_crossings <- function(mst, path, cluster) {
   path_ids <- as.numeric(path$vpath)
 
   first_label <- cluster[path_ids[1]]
   last_label <- cluster[path_ids[length(path_ids)]]
 
-  Z1 <- Z[cluster %in% c(first_label, last_label),]
-
-  mst <- get_mst(dist(Z1))
-
-  new_cluster <- cluster[cluster %in% c(first_label, last_label)]
+  simp_mst <- simplify_sub_mst(mst,
+                               which(cluster == first_label),
+                               which(cluster == last_label),
+                               cluster)
 
   count <- 0
-  for (i in 1:igraph::ecount(mst)) {
-    head_label <- new_cluster[igraph::head_of(mst, i)]
-    tail_label <- new_cluster[igraph::tail_of(mst, i)]
+  for (i in 1:igraph::ecount(simp_mst)) {
+    head <- igraph::head_of(simp_mst, i)
+    tail <- igraph::tail_of(simp_mst, i)
 
-    if (head_label != tail_label) count <- count + 1
+    head_label <- V(simp_mst)$cluster[head]
+    tail_label <- V(simp_mst)$cluster[tail]
+
+    if (setequal(c(head_label, tail_label), c(first_label, last_label))) count <- count + 1
+  }
+
+  for (node in which(V(simp_mst)$group == "outside")) {
+    neighbors <- igraph::neighbors(simp_mst, node)
+    g1_neighbors <- sum(V(simp_mst)$group[neighbors] == "g1")
+    g2_neighbors <- sum(V(simp_mst)$group[neighbors] == "g2")
+
+    count <- count + min(g1_neighbors, g2_neighbors)
   }
 
   count
@@ -70,14 +80,11 @@ get_path_endpts <- function(path, cluster, id) {
   list(from=id[path_ids[1]], to=id[path_ids[length(path_ids)]], same=same)
 }
 
-mst_test <- function(sim_crossings, num_crossings, from, to, same) {
-  if (same) print("Endpoints must belong to different classes! Use the Custom Clusters tab for custom clusters.")
-  else {
-    p_val <- mean(sim_crossings < num_crossings)
+mst_test <- function(sim_crossings, num_crossings, endpts) {
+  p_val <- mean(sim_crossings < num_crossings)
 
-    print(paste0("From: ", from, ", To: ", to))
-    print(paste0("Expected: ", round(mean(sim_crossings), 3), ", SE: ", round(sd(sim_crossings), 3)))
-    print(paste0("Number of Crossings: ", num_crossings))
-    print(paste0("p = ", round(p_val, 3)))
-  }
+  print(paste0("From: ", endpts$from, ", To: ", endpts$to))
+  print(paste0("Expected: ", round(mean(sim_crossings), 3), ", SE: ", round(sd(sim_crossings), 3)))
+  print(paste0("Number of Crossings: ", num_crossings))
+  print(paste0("p = ", round(p_val, 3)))
 }

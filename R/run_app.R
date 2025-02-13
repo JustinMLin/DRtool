@@ -224,7 +224,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
   server <- function(input, output, session) {
 
-    mst_test_vals <- shiny::reactiveValues(from=NULL, to=NULL, sim_crossings=NULL, num_crossings=NULL, same=NULL)
+    mst_test_vals <- shiny::reactiveValues(sim_crossings=NULL, num_crossings=NULL, endpts=NULL)
 
     shortest_path <- shiny::reactive({
       if(!isTruthy(input$from) | !(input$from %in% id)) return(NULL)
@@ -297,25 +297,25 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
     shiny::observeEvent(input$bootstrap, {
       if (is.null(shortest_path())) {
-        mst_test_vals$from <- NULL
-        mst_test_vals$to <- NULL
         mst_test_vals$sim_crossings <- NULL
         mst_test_vals$num_crossings <- NULL
-        mst_test_vals$same <- NULL
+        mst_test_vals$endpts <- NULL
       } else {
-        endpts <- get_path_endpts(shortest_path(), cluster, id)
-        mst_test_vals$from <- endpts$from
-        mst_test_vals$to <- endpts$to
-        mst_test_vals$same <- endpts$same
-        mst_test_vals$sim_crossings <- sim_crossings(Z, shortest_path(), cluster, input$num_sim)
-        mst_test_vals$num_crossings <- count_crossings(Z, shortest_path(), cluster)
+        mst_test_vals$endpts <- get_path_endpts(shortest_path(), cluster, id)
+
+        if (!mst_test_vals$endpts$same) {
+          mst_test_vals$sim_crossings <- sim_crossings(Z, shortest_path(), cluster, input$num_sim)
+          mst_test_vals$num_crossings <- count_crossings(tree, shortest_path(), cluster)
+        }
       }
     })
 
     output$MSTtest <- shiny::renderPrint({
-      if (is.null(mst_test_vals$sim_crossings)) "Select path and click Run Test!"
+      if (is.null(mst_test_vals$endpts)) "Select path and click Run Test!"
+      else if (mst_test_vals$endpts$from != input$from | mst_test_vals$endpts$to != input$to) "Path has changed. Please re-run the test!"
+      else if (mst_test_vals$endpts$same) "To run the MST test, the path must connect samples from different classes!"
       else {
-        mst_test(mst_test_vals$sim_crossings, mst_test_vals$num_crossings, mst_test_vals$from, mst_test_vals$to, mst_test_vals$same)
+        mst_test(mst_test_vals$sim_crossings, mst_test_vals$num_crossings, mst_test_vals$endpts)
       }
     })
 
@@ -492,15 +492,18 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
       } else {
         mst_test_vals_brush$g1 <- rv$g1
         mst_test_vals_brush$g2 <- rv$g2
-        mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush)
-        mst_test_vals_brush$num_crossings <- count_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster)
+
+        if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) == 0) {
+          mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush)
+          mst_test_vals_brush$num_crossings <- count_crossings_brush(tree, mst_test_vals_brush$g1, mst_test_vals_brush$g2)
+        }
       }
     })
 
     output$MSTtest_brush <- shiny::renderPrint({
-      if (is.null(mst_test_vals_brush$sim_crossings)) "Select groups and click Run Test!"
-      else if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) != 0) "To run the MST test, the groups cannot share samples!"
+      if (is.null(mst_test_vals_brush$g1) | is.null(mst_test_vals_brush$g2)) "Select groups and click Run Test!"
       else if (!identical(rv$g1, mst_test_vals_brush$g1) | !identical(rv$g2, mst_test_vals_brush$g2)) "Groups have changed. Please re-run the test!"
+      else if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) != 0) "To run the MST test, the groups cannot share samples!"
       else {
         mst_test_brush(mst_test_vals_brush$sim_crossings, mst_test_vals_brush$num_crossings)
       }
