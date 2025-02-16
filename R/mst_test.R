@@ -14,16 +14,16 @@ count_crossings <- function(mst, path, cluster) {
     head <- igraph::head_of(simp_mst, i)
     tail <- igraph::tail_of(simp_mst, i)
 
-    head_label <- V(simp_mst)$cluster[head]
-    tail_label <- V(simp_mst)$cluster[tail]
+    head_label <- igraph::V(simp_mst)$cluster[head]
+    tail_label <- igraph::V(simp_mst)$cluster[tail]
 
     if (setequal(c(head_label, tail_label), c(first_label, last_label))) count <- count + 1
   }
 
-  for (node in which(V(simp_mst)$group == "outside")) {
+  for (node in which(igraph::V(simp_mst)$group == "outside")) {
     neighbors <- igraph::neighbors(simp_mst, node)
-    g1_neighbors <- sum(V(simp_mst)$group[neighbors] == "g1")
-    g2_neighbors <- sum(V(simp_mst)$group[neighbors] == "g2")
+    g1_neighbors <- sum(igraph::V(simp_mst)$group[neighbors] == "g1")
+    g2_neighbors <- sum(igraph::V(simp_mst)$group[neighbors] == "g2")
 
     count <- count + min(g1_neighbors, g2_neighbors)
   }
@@ -49,12 +49,11 @@ sim_crossings <- function(Z, path, cluster, b) {
   counts = vector(length=b)
   for (i in 1:b) {
 
-    X <- matrix(runif(n, min=-var_ratio[1]/2, max=var_ratio[1]/2), ncol=1)
-    for (j in 2:p) {
-      X <- cbind(X, matrix(runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2), ncol=1))
-    }
+    # for (j in 2:p) {
+      # X <- cbind(X, matrix(runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2), ncol=1))
+    # }
 
-    # X <- MASS::mvrnorm(n, mu=rep(0, p), Sigma=diag(var_ratio))
+    X <- MASS::mvrnorm(n, mu=rep(0, p), Sigma=diag(var_ratio))
 
     mst <- get_mst(dist(X))
 

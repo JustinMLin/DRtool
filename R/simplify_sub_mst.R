@@ -1,9 +1,9 @@
 simplify_sub_mst <- function(mst, g1, g2, cluster) {
   labeled_mst <- mst
-  V(labeled_mst)$group <- "outside"
-  V(labeled_mst)$group[g1] <- "g1"
-  V(labeled_mst)$group[g2] <- "g2"
-  V(labeled_mst)$cluster <- cluster
+  igraph::V(labeled_mst)$group <- "outside"
+  igraph::V(labeled_mst)$group[g1] <- "g1"
+  igraph::V(labeled_mst)$group[g2] <- "g2"
+  igraph::V(labeled_mst)$cluster <- cluster
 
   points <- c(g1, g2)
 
@@ -13,7 +13,7 @@ simplify_sub_mst <- function(mst, g1, g2, cluster) {
 
   # simplify by replacing non-cluster vertices of degree 2
   while(TRUE) {
-    node <- intersect(which(as.numeric(igraph::degree(ret)) == 2), which(V(ret)$group == "outside"))[1]
+    node <- intersect(which(as.numeric(igraph::degree(ret)) == 2), which(igraph::V(ret)$group == "outside"))[1]
 
     if (is.na(node)) break
 
@@ -38,8 +38,8 @@ simplify_sub_mst <- function(mst, g1, g2, cluster) {
       return(ret)
     }
 
-    head <- as.numeric(head_of(ret, edge))
-    tail <- as.numeric(tail_of(ret, edge))
+    head <- as.numeric(igraph::head_of(ret, edge))
+    tail <- as.numeric(igraph::tail_of(ret, edge))
 
     head_neighbors <- igraph::neighbors(ret, head)
     for (neighbor in as.numeric(head_neighbors[head_neighbors != tail])) {
