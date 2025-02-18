@@ -1,3 +1,15 @@
+#' Count the number of crossings between two clusters in the inputted tree
+#'
+#' Given two clusters and a tree, a simplified subtree is created (see
+#' [simplify_sub_mst()]). The number of crossings between the two clusters in
+#' the simplified subtree is then counted.
+#'
+#' @param mst An `igraph` object.
+#' @param path A named list returned by [get_shortest_path()].
+#' @param cluster A vector of length `vcount(mst)` with cluster labels.
+#' @param g1,g2 A numerical vector of indices of the points in each group.
+#'
+#' @returns A numeric.
 count_crossings <- function(mst, path, cluster) {
   path_ids <- as.numeric(path$vpath)
 
@@ -31,7 +43,23 @@ count_crossings <- function(mst, path, cluster) {
   count
 }
 
-sim_crossings <- function(Z, path, cluster, b) {
+#' Simulate the null distribution for number of crossings
+#'
+#' The MST is calculated on uniform sample drawn from a hyperrectangle. The
+#' number of edges crossing a bisecting hyperplane is recorded, and this
+#' process is repeated multiple times. The dimensions of the hyperrectangle are
+#' chosen to match the data.
+#'
+#' @param Z A numerical matrix containing the high-dimensional data.
+#' @param path A named list returned by [get_shortest_path()].
+#' @param cluster A vector of length `nrow(Z)` with cluster labels.
+#' @param b A positive numeric. The number of simulations to run.
+#' @param keep A numeric between 0 and 1. The proportion of variance to retain
+#' when truncating dimensions.
+#' @param g1,g2 A numerical vector of indices of the points in each group.
+#'
+#' @returns A numerical vector.
+sim_crossings <- function(Z, path, cluster, b, keep=0.9) {
   path_ids <- as.numeric(path$vpath)
 
   first_pt = path_ids[1]
@@ -42,18 +70,16 @@ sim_crossings <- function(Z, path, cluster, b) {
   Z1 <- Z[cluster %in% c(first_label, last_label),]
 
   n <- dim(Z1)[1]
-  p <- min(dim(Z1)[1], dim(Z))
 
   var_ratio <- prcomp(Z1)$sdev^2
+  var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
 
   counts = vector(length=b)
   for (i in 1:b) {
-
-    # for (j in 2:p) {
-      # X <- cbind(X, matrix(runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2), ncol=1))
-    # }
-
-    X <- MASS::mvrnorm(n, mu=rep(0, p), Sigma=diag(var_ratio))
+    X <- matrix(nrow=n, ncol=length(var_ratio))
+    for (j in 1:length(var_ratio)) {
+      X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+    }
 
     mst <- get_mst(dist(X))
 
@@ -71,6 +97,22 @@ sim_crossings <- function(Z, path, cluster, b) {
   counts
 }
 
+#' Retrieves the id's of the path endpoints.
+#'
+#' This function retrieves the id's of the path endpoints, which may be
+#' different from their indices.
+#'
+#' @param path A named list returned by [get_shortest_path()].
+#' @param cluster A vector with cluster labels.
+#' @param id A vector of point id's.
+#'
+#' @returns A list with the following components:
+#' \item{from}{The id of the first point in the path.}
+#'
+#' \item{to}{The id of the last point in the path.}
+#'
+#' \item{same}{A boolean denoting whether the first and last points of the path
+#' belong to the same cluster.}
 get_path_endpts <- function(path, cluster, id) {
   path_ids <- as.numeric(path$vpath)
 
@@ -79,6 +121,14 @@ get_path_endpts <- function(path, cluster, id) {
   list(from=id[path_ids[1]], to=id[path_ids[length(path_ids)]], same=same)
 }
 
+#' Runs the MST test for two clusters
+#'
+#' Calculates a p-value from the simulated numbers of crossings and the actual
+#' number of crossings, then prints the results.
+#'
+#' @param sim_crossings A numerical vector of simulated numbers of crossings.
+#' @param num_crossings The actual number of crossings.
+#' @param endpts A named list returned by [get_path_endpts()].
 mst_test <- function(sim_crossings, num_crossings, endpts) {
   p_val <- mean(sim_crossings < num_crossings)
 

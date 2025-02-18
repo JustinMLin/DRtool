@@ -4,7 +4,7 @@
 #' with pie charts, while numerical data is plotted with box plots.
 #'
 #' @param Z A numerical matrix containing the high-dimensional data.
-#' @param path A named list returned by `get_shortest_path()`.
+#' @param path A named list returned by [get_shortest_path()].
 #' @param g1,g2 A numerical vector of the indices of the points each group.
 #' @param cluster A vector of length `nrow(Z)` with cluster labels.
 #' @param meta_data A data frame with a number of rows equal to `nrow(Z)`. For

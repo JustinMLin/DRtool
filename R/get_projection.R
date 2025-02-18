@@ -11,8 +11,8 @@
 #' belonging to the two groups selected by the user.
 #'
 #' @param Z A numerical matrix containing the high-dimensional data.
-#' @param path A named list returned by `get_shortest_path()`.
-#' @param g1,g2 A numerical vector of the indices of the points each group.
+#' @param path A named list returned by [get_shortest_path()].
+#' @param g1,g2 A numerical vector of the indices of the points in each group.
 #' @param cluster A vector of length `nrow(Z)` with cluster labels.
 #' @param dim A numeric greater than or equal to 2.
 #' @param degree A positive numeric.

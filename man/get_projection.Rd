@@ -12,7 +12,7 @@ get_projection_brush(Z, path, g1, g2, cluster, dim, degree)
 \arguments{
 \item{Z}{A numerical matrix containing the high-dimensional data.}
 
-\item{path}{A named list returned by \code{get_shortest_path()}.}
+\item{path}{A named list returned by \code{\link[=get_shortest_path]{get_shortest_path()}}.}
 
 \item{cluster}{A vector of length \code{nrow(Z)} with cluster labels.}
 
@@ -20,7 +20,7 @@ get_projection_brush(Z, path, g1, g2, cluster, dim, degree)
 
 \item{degree}{A positive numeric.}
 
-\item{g1, g2}{A numerical vector of the indices of the points each group.}
+\item{g1, g2}{A numerical vector of the indices of the points in each group.}
 }
 \value{
 A list with the following components:

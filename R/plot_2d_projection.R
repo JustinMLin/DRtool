@@ -5,7 +5,7 @@
 #' projected path and estimated density (optional). In addition, the use may
 #' choose to display all edges of the minimum spanning tree, not just the path.
 #'
-#' @param mst A `igraph` object.
+#' @param mst An `igraph` object.
 #' @param cluster A vector of length `nrow(projected_pts)` containing the
 #' cluster labels.
 #' @param id A numerical vector containing the labels of the points.

@@ -1,3 +1,4 @@
+#' @rdname count_crossings
 count_crossings_brush <- function(mst, g1, g2) {
   cluster = rep(3, igraph::vcount(mst))
   cluster[g1] = 1
@@ -27,23 +28,21 @@ count_crossings_brush <- function(mst, g1, g2) {
   count
 }
 
-sim_crossings_brush <- function(Z, g1, g2, cluster, b) {
+#' @rdname sim_crossings
+sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9) {
   Z1 <- Z[c(g1, g2),]
 
   n <- dim(Z1)[1]
-  p <- min(dim(Z1)[1], dim(Z))
 
   var_ratio <- prcomp(Z1)$sdev^2
+  var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
 
   counts = vector(length=b)
   for (i in 1:b) {
-
-    X <- matrix(runif(n, min=-var_ratio[1]/2, max=var_ratio[1]/2), ncol=1)
-    for (j in 2:p) {
-      X <- cbind(X, matrix(runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2), ncol=1))
+    X <- matrix(nrow=n, ncol=length(var_ratio))
+    for (j in 1:length(var_ratio)) {
+      X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
     }
-
-    # X <- MASS::mvrnorm(n, mu=rep(0, p), Sigma=diag(var_ratio))
 
     mst <- get_mst(dist(X))
 
@@ -61,6 +60,7 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b) {
   counts
 }
 
+#' @rdname mst_test
 mst_test_brush <- function(sim_crossings, num_crossings) {
   p_val <- mean(sim_crossings < num_crossings)
 

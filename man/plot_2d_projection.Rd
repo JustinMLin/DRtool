@@ -38,7 +38,7 @@ plot_2d_projection_brush(
 )
 }
 \arguments{
-\item{mst}{A \code{igraph} object.}
+\item{mst}{An \code{igraph} object.}
 
 \item{cluster}{A vector of length \code{nrow(projected_pts)} containing the
 cluster labels.}

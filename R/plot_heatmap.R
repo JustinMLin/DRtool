@@ -6,7 +6,7 @@
 #'  * user-defined groups for [plot_heatmap_brush()].
 #'
 #' @param Z A numerical matrix containing the high-dimensional data.
-#' @param path A named list returned by `get_shortest_path()`.
+#' @param path A named list returned by [get_shortest_path()].
 #' @param g1,g2 A numerical vector of the indices of the points each group.
 #' @param cluster A vector of length `nrow(Z)` with cluster labels.
 #' @param col_names A vector of length `col(Z)` with column names.

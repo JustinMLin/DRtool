@@ -12,7 +12,7 @@ plot_heatmap_brush(Z, g1, g2, col_names)
 \arguments{
 \item{Z}{A numerical matrix containing the high-dimensional data.}
 
-\item{path}{A named list returned by \code{get_shortest_path()}.}
+\item{path}{A named list returned by \code{\link[=get_shortest_path]{get_shortest_path()}}.}
 
 \item{cluster}{A vector of length \code{nrow(Z)} with cluster labels.}
 

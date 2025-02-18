@@ -27,8 +27,7 @@ Imports:
     ggnetwork,
     stringr,
     ComplexHeatmap,
-    InteractiveComplexHeatmap,
-    MASS
+    InteractiveComplexHeatmap
 Suggests:
     knitr,
     MASS,
