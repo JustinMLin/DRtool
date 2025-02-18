@@ -19,7 +19,7 @@ A list with the following components:
 
 \item{to}{The id of the last point in the path.}
 
-\item{same}{A boolean denoting whether the first and last points of the path
+\item{same}{A Boolean denoting whether the first and last points of the path
 belong to the same cluster.}
 }
 \description{

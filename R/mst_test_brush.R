@@ -29,7 +29,7 @@ count_crossings_brush <- function(mst, g1, g2) {
 }
 
 #' @rdname sim_crossings
-sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9) {
+sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9, parallel=FALSE) {
   Z1 <- Z[c(g1, g2),]
 
   n <- dim(Z1)[1]
@@ -38,23 +38,50 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9) {
   var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
 
   counts = vector(length=b)
-  for (i in 1:b) {
-    X <- matrix(nrow=n, ncol=length(var_ratio))
-    for (j in 1:length(var_ratio)) {
-      X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+
+  if (parallel) {
+    num_cores <- parallel::detectCores()
+
+    counts <- parallel::mclapply(1:b, function(i) {
+      X <- matrix(nrow=n, ncol=length(var_ratio))
+      for (j in 1:length(var_ratio)) {
+        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      }
+
+      mst <- get_mst(dist(X))
+
+      count <- 0
+      for (k in 1:igraph::ecount(mst)) {
+        head <- X[igraph::head_of(mst, k),]
+        tail <- X[igraph::tail_of(mst, k),]
+
+        if (sign(head[1]) != sign(tail[1])) count <- count + 1
+      }
+
+      counts[i] <- count
+    }, mc.cores=num_cores-1)
+
+    counts <- unlist(counts)
+  }
+  else {
+    for (i in 1:b) {
+      X <- matrix(nrow=n, ncol=length(var_ratio))
+      for (j in 1:length(var_ratio)) {
+        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      }
+
+      mst <- get_mst(dist(X))
+
+      count <- 0
+      for (k in 1:igraph::ecount(mst)) {
+        head <- X[igraph::head_of(mst, k),]
+        tail <- X[igraph::tail_of(mst, k),]
+
+        if (sign(head[1]) != sign(tail[1])) count <- count + 1
+      }
+
+      counts[i] <- count
     }
-
-    mst <- get_mst(dist(X))
-
-    count <- 0
-    for (k in 1:igraph::ecount(mst)) {
-      head <- X[igraph::head_of(mst, k),]
-      tail <- X[igraph::tail_of(mst, k),]
-
-      if (sign(head[1]) != sign(tail[1])) count <- count + 1
-    }
-
-    counts[i] <- count
   }
 
   counts

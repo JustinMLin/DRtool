@@ -39,7 +39,7 @@
 #' run_app(Z, X, cluster)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL, parallel=FALSE) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
     stop("Z and X must be matrices.")
   }
@@ -304,7 +304,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         mst_test_vals$endpts <- get_path_endpts(shortest_path(), cluster, id)
 
         if (!mst_test_vals$endpts$same) {
-          mst_test_vals$sim_crossings <- sim_crossings(Z, shortest_path(), cluster, input$num_sim)
+          mst_test_vals$sim_crossings <- sim_crossings(Z, shortest_path(), cluster, input$num_sim, parallel=parallel)
           mst_test_vals$num_crossings <- count_crossings(tree, shortest_path(), cluster)
         }
       }
@@ -494,7 +494,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         mst_test_vals_brush$g2 <- rv$g2
 
         if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) == 0) {
-          mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush)
+          mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush, parallel=parallel)
           mst_test_vals_brush$num_crossings <- count_crossings_brush(tree, mst_test_vals_brush$g1, mst_test_vals_brush$g2)
         }
       }

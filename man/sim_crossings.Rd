@@ -5,7 +5,7 @@
 \alias{sim_crossings_brush}
 \title{Simulate the null distribution for number of crossings}
 \usage{
-sim_crossings(Z, path, cluster, b, keep = 0.9)
+sim_crossings(Z, path, cluster, b, keep = 0.9, parallel = FALSE)
 
 sim_crossings_brush(Z, g1, g2, cluster, b, keep = 0.9)
 }
@@ -20,6 +20,10 @@ sim_crossings_brush(Z, g1, g2, cluster, b, keep = 0.9)
 
 \item{keep}{A numeric between 0 and 1. The proportion of variance to retain
 when truncating dimensions.}
+
+\item{parallel}{A Boolean denoting whether parallel computing should be
+used. Parallel computing is implemented via \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is
+not available on Windows.}
 
 \item{g1, g2}{A numerical vector of indices of the points in each group.}
 }

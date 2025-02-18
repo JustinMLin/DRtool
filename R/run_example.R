@@ -9,8 +9,8 @@
 #' @examples
 #' run_example("real")
 #' @export
-run_example <- function(cluster="kmeans") {
-  if (cluster == "real") run_app(MNIST_pca, MNIST_low, MNIST_labels, id=MNIST_id)
-  else if (cluster == "kmeans") run_app(MNIST_pca, MNIST_low, MNIST_kmeans_cluster, id=MNIST_id)
+run_example <- function(cluster="kmeans", parallel=FALSE) {
+  if (cluster == "real") run_app(MNIST_pca, MNIST_low, MNIST_labels, id=MNIST_id, parallel=parallel)
+  else if (cluster == "kmeans") run_app(MNIST_pca, MNIST_low, MNIST_kmeans_cluster, id=MNIST_id, parallel=parallel)
   else stop('cluster must be "real" or "kmeans"')
 }

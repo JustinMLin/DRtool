@@ -32,7 +32,8 @@ Suggests:
     knitr,
     MASS,
     rmarkdown,
-    Rtsne
+    Rtsne,
+    parallel
 Remotes:
     jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap

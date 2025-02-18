@@ -56,10 +56,13 @@ count_crossings <- function(mst, path, cluster) {
 #' @param b A positive numeric. The number of simulations to run.
 #' @param keep A numeric between 0 and 1. The proportion of variance to retain
 #' when truncating dimensions.
+#' @param parallel A Boolean denoting whether parallel computing should be
+#' used. Parallel computing is implemented via [parallel::mclapply()], which is
+#' not available on Windows.
 #' @param g1,g2 A numerical vector of indices of the points in each group.
 #'
 #' @returns A numerical vector.
-sim_crossings <- function(Z, path, cluster, b, keep=0.9) {
+sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
   path_ids <- as.numeric(path$vpath)
 
   first_pt = path_ids[1]
@@ -75,23 +78,50 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9) {
   var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
 
   counts = vector(length=b)
-  for (i in 1:b) {
-    X <- matrix(nrow=n, ncol=length(var_ratio))
-    for (j in 1:length(var_ratio)) {
-      X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+
+  if (parallel) {
+    num_cores <- parallel::detectCores()
+
+    counts <- parallel::mclapply(1:b, function(i) {
+      X <- matrix(nrow=n, ncol=length(var_ratio))
+      for (j in 1:length(var_ratio)) {
+        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      }
+
+      mst <- get_mst(dist(X))
+
+      count <- 0
+      for (k in 1:igraph::ecount(mst)) {
+        head <- X[igraph::head_of(mst, k),]
+        tail <- X[igraph::tail_of(mst, k),]
+
+        if (sign(head[1]) != sign(tail[1])) count <- count + 1
+      }
+
+      counts[i] <- count
+    }, mc.cores=num_cores-1)
+
+    counts <- unlist(counts)
+  }
+  else {
+    for (i in 1:b) {
+      X <- matrix(nrow=n, ncol=length(var_ratio))
+      for (j in 1:length(var_ratio)) {
+        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      }
+
+      mst <- get_mst(dist(X))
+
+      count <- 0
+      for (k in 1:igraph::ecount(mst)) {
+        head <- X[igraph::head_of(mst, k),]
+        tail <- X[igraph::tail_of(mst, k),]
+
+        if (sign(head[1]) != sign(tail[1])) count <- count + 1
+      }
+
+      counts[i] <- count
     }
-
-    mst <- get_mst(dist(X))
-
-    count <- 0
-    for (k in 1:igraph::ecount(mst)) {
-      head <- X[igraph::head_of(mst, k),]
-      tail <- X[igraph::tail_of(mst, k),]
-
-      if (sign(head[1]) != sign(tail[1])) count <- count + 1
-    }
-
-    counts[i] <- count
   }
 
   counts
@@ -111,7 +141,7 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9) {
 #'
 #' \item{to}{The id of the last point in the path.}
 #'
-#' \item{same}{A boolean denoting whether the first and last points of the path
+#' \item{same}{A Boolean denoting whether the first and last points of the path
 #' belong to the same cluster.}
 get_path_endpts <- function(path, cluster, id) {
   path_ids <- as.numeric(path$vpath)
