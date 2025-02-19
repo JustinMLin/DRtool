@@ -4,10 +4,16 @@
 \alias{run_example}
 \title{Launch dimension reduction tool examples}
 \usage{
-run_example(cluster = "kmeans")
+run_example(cluster = c("real", "kmeans"), parallel = FALSE)
 }
 \arguments{
-\item{cluster}{"real" or "kmeans".}
+\item{cluster}{A character string indicating the clustering to project onto
+the low-dimensional embedding. Possible values of cluster are "real" or
+"kmeans".}
+
+\item{parallel}{A Boolean indicating whether parallel computing should be
+used. The implementation uses \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is not available
+on Windows.}
 }
 \description{
 The current implementation contains one example on the MNIST data set. For

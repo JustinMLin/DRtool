@@ -56,9 +56,9 @@ count_crossings <- function(mst, path, cluster) {
 #' @param b A positive numeric. The number of simulations to run.
 #' @param keep A numeric between 0 and 1. The proportion of variance to retain
 #' when truncating dimensions.
-#' @param parallel A Boolean denoting whether parallel computing should be
-#' used. Parallel computing is implemented via [parallel::mclapply()], which is
-#' not available on Windows.
+#' @param parallel A Boolean indicating whether parallel computing should be
+#' used. The implementation uses [parallel::mclapply()], which is not available
+#' on Windows.
 #' @param g1,g2 A numerical vector of indices of the points in each group.
 #'
 #' @returns A numerical vector.

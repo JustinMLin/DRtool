@@ -11,7 +11,8 @@ run_app(
   Z_dist = dist(Z),
   id = NULL,
   meta_data = NULL,
-  col_names = NULL
+  col_names = NULL,
+  parallel = FALSE
 )
 }
 \arguments{
@@ -35,6 +36,10 @@ presenting extra meta data.}
 \item{col_names}{A vector of length \code{nrow(Z)}. The column names will be used
 when viewing sub-heatmaps. If \code{col_names = NULL}, the column names will be
 pulled from \code{Z}.}
+
+\item{parallel}{A Boolean indicating whether parallel computing should be
+used. The implementation uses \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is not available
+on Windows.}
 }
 \description{
 Launches the dimension reduction tool. The required inputs are the
@@ -58,5 +63,5 @@ X <- Rtsne(Z, dims=2, perplexity=20)$Y
 cluster <- kmeans(Z, centers=3, nstart=10)$cluster
 
 #launch tool
-run_app(Z, X, cluster)
+run_app(Z, X, cluster, parallel=FALSE)
 }

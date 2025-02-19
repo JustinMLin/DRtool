@@ -18,6 +18,9 @@
 #' @param col_names A vector of length `nrow(Z)`. The column names will be used
 #' when viewing sub-heatmaps. If `col_names = NULL`, the column names will be
 #' pulled from `Z`.
+#' @param parallel A Boolean indicating whether parallel computing should be
+#' used. The implementation uses [parallel::mclapply()], which is not available
+#' on Windows.
 #'
 #' @examples
 #' library(MASS)
@@ -36,7 +39,7 @@
 #' cluster <- kmeans(Z, centers=3, nstart=10)$cluster
 #'
 #' #launch tool
-#' run_app(Z, X, cluster)
+#' run_app(Z, X, cluster, parallel=FALSE)
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL, parallel=FALSE) {
