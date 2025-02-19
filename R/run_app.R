@@ -86,15 +86,14 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
       bslib::layout_sidebar(
         sidebar=bslib::sidebar(
           open="always",
+
+          shiny::numericInput("from", "From ID", min=0, value = 0),
+          shiny::numericInput("to", "To ID", min=0, value = 0),
+
           bslib::accordion(
+            open=FALSE,
             multiple=FALSE,
             style="--bs-accordion-btn-bg: #f2f2f2",
-            bslib::accordion_panel(
-              "Path Selection",
-              style="background-color: #f2f2f2",
-              shiny::numericInput("from", "From ID", min=0, value = 0),
-              shiny::numericInput("to", "To ID", min=0, value = 0)
-            ),
             bslib::accordion_panel(
               "Path Projection Settings",
               style="background-color: #f2f2f2",
@@ -112,11 +111,12 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
               shiny::numericInput("num_sim", "Number of Simulations", min=50, 500, value=100, step=50),
               shiny::actionButton("bootstrap", "Run Test",
                                   style="color: black;
-                                 background-color: white;
-                                 border-color: #dee2e6;
-                                 margin: 4px 0px")
+                               background-color: white;
+                               border-color: #dee2e6;
+                               margin: 4px 0px")
             )
           ),
+
           shiny::radioButtons("med_subtree1",
                        label = "Show medoid subtree?",
                        choices = c("Hide", "Show"),
@@ -149,30 +149,29 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
       bslib::layout_sidebar(
         sidebar=bslib::sidebar(
           open="always",
+
+          shiny::actionButton("group1", "Submit Group 1",
+                              style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+          shiny::actionButton("group2", "Submit Group 2",
+                              style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+          shiny::actionButton("clear_brush", "Clear Groups",
+                              style="color: black;
+                                 background-color: white;
+                                 border-color: #dee2e6;
+                                 margin: 4px 0px"),
+          shiny::numericInput("from_brush", "From ID", value = 0),
+          shiny::numericInput("to_brush", "To ID", value = 0),
+
           bslib::accordion(
+            open=FALSE,
             multiple=FALSE,
             style="--bs-accordion-btn-bg: #f2f2f2",
-            bslib::accordion_panel(
-              "Group Selection",
-              style="background-color: #f2f2f2",
-              shiny::actionButton("group1", "Submit Group 1",
-                           style="color: black;
-                                 background-color: white;
-                                 border-color: #dee2e6;
-                                 margin: 4px 0px"),
-              shiny::actionButton("group2", "Submit Group 2",
-                           style="color: black;
-                                 background-color: white;
-                                 border-color: #dee2e6;
-                                 margin: 4px 0px"),
-              shiny::actionButton("clear_brush", "Clear Groups",
-                           style="color: black;
-                                 background-color: white;
-                                 border-color: #dee2e6;
-                                 margin: 4px 0px"),
-              shiny::numericInput("from_brush", "From ID", value = 0),
-              shiny::numericInput("to_brush", "To ID", value = 0)
-            ),
             bslib::accordion_panel(
               "Path Projection Settings",
               style="background-color: #f2f2f2",
