@@ -29,13 +29,13 @@ count_crossings_brush <- function(mst, g1, g2) {
 }
 
 #' @rdname sim_crossings
-sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9, parallel=FALSE) {
+sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.7, parallel=FALSE) {
   Z1 <- Z[c(g1, g2),]
 
   n <- dim(Z1)[1]
 
-  var_ratio <- prcomp(Z1)$sdev^2
-  var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
+  sd_ratio <- prcomp(Z1)$sdev
+  sd_ratio <- sd_ratio[sd_ratio^2 > mean(sd_ratio^2)]
 
   counts = vector(length=b)
 
@@ -43,9 +43,9 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9, parallel=FALSE)
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=n, ncol=length(var_ratio))
-      for (j in 1:length(var_ratio)) {
-        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(sd_ratio))
+      for (j in 1:length(sd_ratio)) {
+        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -65,9 +65,9 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.9, parallel=FALSE)
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=n, ncol=length(var_ratio))
-      for (j in 1:length(var_ratio)) {
-        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(sd_ratio))
+      for (j in 1:length(sd_ratio)) {
+        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
       }
 
       mst <- get_mst(dist(X))

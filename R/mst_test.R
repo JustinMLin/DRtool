@@ -62,7 +62,7 @@ count_crossings <- function(mst, path, cluster) {
 #' @param g1,g2 A numerical vector of indices of the points in each group.
 #'
 #' @returns A numerical vector.
-sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
+sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   path_ids <- as.numeric(path$vpath)
 
   first_pt = path_ids[1]
@@ -74,8 +74,8 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
 
   n <- dim(Z1)[1]
 
-  var_ratio <- prcomp(Z1)$sdev^2
-  var_ratio <- var_ratio[cumsum(var_ratio)/sum(var_ratio) < keep]
+  sd_ratio <- prcomp(Z1)$sdev
+  sd_ratio <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep]
 
   counts = vector(length=b)
 
@@ -83,9 +83,9 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=n, ncol=length(var_ratio))
-      for (j in 1:length(var_ratio)) {
-        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(sd_ratio))
+      for (j in 1:length(sd_ratio)) {
+        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -105,9 +105,9 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=n, ncol=length(var_ratio))
-      for (j in 1:length(var_ratio)) {
-        X[,j] <- runif(n, min=-var_ratio[j]/2, max=var_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(sd_ratio))
+      for (j in 1:length(sd_ratio)) {
+        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
       }
 
       mst <- get_mst(dist(X))
