@@ -35,7 +35,7 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.7, parallel=FALSE)
   n <- dim(Z1)[1]
 
   sd_ratio <- prcomp(Z1)$sdev
-  sd_ratio <- sd_ratio[sd_ratio^2 > mean(sd_ratio^2)]
+  sd_ratio <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep]
 
   counts = vector(length=b)
 
