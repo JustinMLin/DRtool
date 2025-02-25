@@ -28,6 +28,7 @@ simplify_sub_mst <- function(mst, g1, g2, cluster) {
     ret <- ret - node
   }
 
+  # collapse edges between non-cluster vertices
   while(TRUE) {
     head_groups <- igraph::head_of(ret, 1:igraph::ecount(ret))$group
     tail_groups <- igraph::tail_of(ret, 1:igraph::ecount(ret))$group
