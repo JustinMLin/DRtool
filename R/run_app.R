@@ -83,7 +83,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     theme=bslib::bs_theme(bootswatch="cosmo"),
     fillable=FALSE,
     bslib::nav_panel(
-      shinyjs::useShinyjs(),
       title="Default Clusters",
 
       bslib::layout_sidebar(
