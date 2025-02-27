@@ -17,7 +17,9 @@
 run_example <- function(cluster=c("real", "kmeans"), parallel=FALSE) {
   if (length(cluster > 1)) cluster <- cluster[1]
 
-  if (cluster == "real") run_app(MNIST_pca, MNIST_low, MNIST_labels, id=MNIST_id, parallel=parallel)
-  else if (cluster == "kmeans") run_app(MNIST_pca, MNIST_low, MNIST_kmeans_cluster, id=MNIST_id, parallel=parallel)
+  col_names <- sapply(1:300, function(i) paste0("PC", i))
+
+  if (cluster == "real") run_app(MNIST_pca, MNIST_low, MNIST_labels, id=MNIST_id, col_names=col_names, parallel=parallel)
+  else if (cluster == "kmeans") run_app(MNIST_pca, MNIST_low, MNIST_kmeans_cluster, id=MNIST_id, col_names=col_names, parallel=parallel)
   else stop('cluster must be "real" or "kmeans"')
 }

@@ -55,8 +55,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
   if (!is.null(id) && length(id) != nrow(Z)) {
     stop("The length of id must be equal to the number of rows of Z and X.")
   }
-  if (!is.null(col_names) && length(col_names) != nrow(Z)) {
-    stop("The length of col_names must be equal to the number of rows of Z and X.")
+  if (!is.null(col_names) && length(col_names) != ncol(Z)) {
+    stop("The length of col_names must be equal to the number of columns of Z.")
   }
   if (!is.null(meta_data) && nrow(meta_data) != nrow(Z)) {
     stop("meta_data must have the same number of rows as Z.")
