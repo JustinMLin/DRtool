@@ -12,7 +12,8 @@
 #' on Windows.
 #'
 #' @examples
-#' run_example("real")
+#' # parallel computing is not available on Windows
+#' run_example(cluster="real", parallel=TRUE)
 #' @export
 run_example <- function(cluster=c("real", "kmeans"), parallel=FALSE) {
   if (length(cluster > 1)) cluster <- cluster[1]

@@ -62,6 +62,7 @@ X <- Rtsne(Z, dims=2, perplexity=20)$Y
 # compute k-means clustering
 cluster <- kmeans(Z, centers=3, nstart=10)$cluster
 
-#launch tool
-run_app(Z, X, cluster, parallel=FALSE)
+# launch tool
+# parallel computing is not available on Windows
+run_app(Z, X, cluster, parallel=TRUE)
 }

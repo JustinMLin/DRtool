@@ -6,7 +6,7 @@
 #'
 #' @param mst An `igraph` object.
 #' @param g1,g2 A numerical vector of indices of the points in each group.
-#' @param A vector of length `vcount(mst)` with cluster labels.
+#' @param cluster A vector of length `vcount(mst)` with cluster labels.
 #'
 #' @returns An `igraph` object.
 simplify_sub_mst <- function(mst, g1, g2, cluster) {

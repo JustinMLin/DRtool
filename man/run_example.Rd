@@ -21,5 +21,6 @@ each example, the tool can be launched visualizing the true class labels or
 a computed k-means clustering.
 }
 \examples{
-run_example("real")
+# parallel computing is not available on Windows
+run_example(cluster="real", parallel=TRUE)
 }
