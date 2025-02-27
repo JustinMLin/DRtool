@@ -60,9 +60,9 @@ example of this process, but analysts should carefully consider how to construct
 a low-dimensional embedding of their own data.
 
 To create the low-dimensional embedding, we apply UMAP using the implementation
-in [umap](https://cran.r-project.org/web/packages/umap/index.html). The Python
-implementation provided by the package is recommend for its efficiency, but it
-requires a Python installation setup with
+in the R package [umap](https://cran.r-project.org/web/packages/umap/index.html).
+The Python implementation provided by the package is recommend for its
+efficiency, but it requires a Python installation setup with
 [reticulate](https://cran.r-project.org/web/packages/reticulate/index.html) and
 the Python package [umap-learn](https://umap-learn.readthedocs.io/en/latest/).
 For ease of reproducibility, we resort to the provided R implementation.
@@ -70,6 +70,7 @@ For ease of reproducibility, we resort to the provided R implementation.
 ```{r low-dimensional embedding}
 library(umap)
 
+# X <- umap(Z_pca, method="umap-learn", n_neighbors=30)$layout
 X <- umap(Z_pca, method="naive", n_neighbors=30)$layout
 ```
 
@@ -77,22 +78,28 @@ X <- umap(Z_pca, method="naive", n_neighbors=30)$layout
 
 To run the tool, the required inputs are the high-dimensional data,
 low-dimensional embedding, and cluster labels. We also supply the indices of the
-randomly sampled images to serve as IDs. Optionally, the user may also provide
-a dist object or distance matrix for the high-dimensional data. By default,
-the distance matrix is calculated using Euclidean distance. This matrix is used
-in the construction of the minimum spanning tree.
+randomly sampled images to serve as IDs and a vector of column names (PC1, PC2,
+...). Optionally, the user may also provide a dist object or distance matrix
+for the high-dimensional data if the default Euclidean distance is not desired.
+These distances are used to construct the minimum spanning tree. Lastly, the
+user may also take advantage of parallel computing. Parallel computing is used
+when simulating the null distributions for the MST test. The implementation
+uses [mclapply()](https://www.rdocumentation.org/packages/parallel/versions/3.4.0/topics/mclapply)
+from the [parallel](https://www.rdocumentation.org/packages/parallel/versions/3.6.2).
+Unfortunately, it is not available for Windows machines.
 
 ```{r run tool, eval=FALSE}
 library(DRtool)
 
-run_app(Z=Z, X=X, cluster=true_labels, id=subsample)
+col_names <- sapply(1:300, function(i) paste0("PC", i))
+run_app(Z=Z_pca, X=X, cluster=true_labels, id=subsample, col_names=col_names, parallel=TRUE)
 ```
 
-In practice, the true class labels might not be available. To replicated this
+In practice, the true class labels might not be available. To replicate this
 situation, we can run the tool using a calculated k-means clustering.
 
 ```{r run tool kmeans, eval=FALSE}
-kmeans_cluster = kmeans(Z_pca, centers=10, iter.max=100, nstart=20)$cluster
+kmeans_cluster <- kmeans(Z_pca, centers=10, iter.max=100, nstart=20)$cluster
 
 run_app(Z=Z, X=X, cluster=kmeans_labels, id=subsample)
 ```

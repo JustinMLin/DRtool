@@ -1,3 +1,14 @@
+#' Simplify subtree for count_crossings()
+#'
+#' Computes the minimal subtree containg g1 and g2, then simplifies it in
+#' preparation for [count_crossings()]. First, paths of non-groups points are
+#' condensed into one edge. Then, edges conned non-group points are collapsed.
+#'
+#' @param mst An `igraph` object.
+#' @param g1,g2 A numerical vector of indices of the points in each group.
+#' @param A vector of length `vcount(mst)` with cluster labels.
+#'
+#' @returns An `igraph` object.
 simplify_sub_mst <- function(mst, g1, g2, cluster) {
   labeled_mst <- mst
   igraph::V(labeled_mst)$group <- "outside"
