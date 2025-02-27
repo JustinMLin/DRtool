@@ -22,7 +22,7 @@ count_crossings_brush <- function(mst, g1, g2) {
     g1_neighbors <- sum(igraph::V(simp_mst)$group[neighbors] == "g1")
     g2_neighbors <- sum(igraph::V(simp_mst)$group[neighbors] == "g2")
 
-    count <- count + min(g1_neighbors, g2_neighbors)
+    if (min(g1_neighbors, g2_neighbors) > 0) count <- count + max(g1_neighbors, g2_neighbors)
   }
 
   count
