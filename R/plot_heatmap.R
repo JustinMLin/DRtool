@@ -38,11 +38,11 @@ plot_heatmap <- function(Z, path, cluster, col_names) {
     ddr <- reorder(ddr, colMeans(Z[first_ids,]) - colMeans(Z[last_ids,]))
   }
 
-  ComplexHeatmap::Heatmap(pts, row_split=group,
-                          cluster_columns = ddr,
-                          column_labels = col_names,
-                          show_row_dend=FALSE,
-                          show_column_dend=FALSE, show_column_names=FALSE,
-                          show_heatmap_legend=FALSE,
-                          row_gap = grid::unit(3, "mm"))
+  suppressMessages(ComplexHeatmap::Heatmap(pts, row_split=group,
+                                           cluster_columns = ddr,
+                                           column_labels = col_names,
+                                           show_row_dend=FALSE,
+                                           show_column_dend=FALSE, show_column_names=FALSE,
+                                           show_heatmap_legend=FALSE,
+                                           row_gap = grid::unit(3, "mm")))
 }

@@ -17,12 +17,12 @@ plot_heatmap_brush <- function(Z, g1, g2, col_names) {
     ddr <- reorder(ddr, colMeans(Z[just_g1,]) - colMeans(Z[just_g2,]))
   }
 
-  ComplexHeatmap::Heatmap(pts, row_split=group,
-                          cluster_columns = ddr,
-                          column_labels = col_names,
-                          cluster_row_slices=FALSE,
-                          show_row_dend=FALSE,
-                          show_column_dend=FALSE, show_column_names=FALSE,
-                          show_heatmap_legend=FALSE,
-                          row_gap = grid::unit(3, "mm"))
+  suppressMessages(ComplexHeatmap::Heatmap(pts, row_split=group,
+                                           cluster_columns = ddr,
+                                           column_labels = col_names,
+                                           cluster_row_slices=FALSE,
+                                           show_row_dend=FALSE,
+                                           show_column_dend=FALSE, show_column_names=FALSE,
+                                           show_heatmap_legend=FALSE,
+                                           row_gap = grid::unit(3, "mm")))
 }

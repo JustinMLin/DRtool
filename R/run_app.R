@@ -247,7 +247,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     })
 
     ht <- shiny::reactive({
-      if (is.null(shortest_path())) NULL else suppressMessages(plot_heatmap(Z, shortest_path(), cluster, col_names))
+      if (is.null(shortest_path())) NULL else plot_heatmap(Z, shortest_path(), cluster, col_names)
     })
 
     output$slider <- shiny::renderUI({
@@ -329,8 +329,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
     shiny::observe({
       if (!is.null(ht())) {
-        ht <- ComplexHeatmap::draw(ht())
-        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap")
+        suppressMessages(InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht(), "heatmap"))
       }
     })
 
@@ -519,8 +518,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
     shiny::observe({
       if (!is.null(ht_brush())) {
-        ht <- ComplexHeatmap::draw(ht_brush())
-        InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht, "heatmap_brush")
+        suppressMessages(InteractiveComplexHeatmap::makeInteractiveComplexHeatmap(input, output, session, ht_brush(), "heatmap_brush"))
       }
     })
 
