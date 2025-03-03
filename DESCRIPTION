@@ -6,7 +6,7 @@ Authors@R: c(
            comment = c(ORCID = "0009-0007-7190-2430")),
     person("Julia", "Fukuyama", email = "jfukuyam@iu.edu", role = "aut",
            comment = c(ORCID = "0000-0002-7590-5563")))
-Description: A tool for assessing and visualizing dimension reduction performance.
+Description: An interactive tool for analyzing high-dimensional clustering and dimension reduction results.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -17,7 +17,6 @@ Imports:
     gridExtra,
     scales,
     usedist,
-    MASS,
     shiny,
     bslib,
     plotly,
@@ -33,7 +32,9 @@ Suggests:
     MASS,
     rmarkdown,
     Rtsne,
-    parallel
+    parallel,
+    dslabs,
+    umap
 Remotes:
     jokergoo/ComplexHeatmap,
     jokergoo/InteractiveComplexHeatmap

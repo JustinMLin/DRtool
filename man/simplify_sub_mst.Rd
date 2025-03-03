@@ -11,7 +11,7 @@ simplify_sub_mst(mst, g1, g2, cluster)
 
 \item{g1, g2}{A numerical vector of indices of the points in each group.}
 
-\item{A}{vector of length \code{vcount(mst)} with cluster labels.}
+\item{cluster}{A vector of length \code{vcount(mst)} with cluster labels.}
 }
 \value{
 An \code{igraph} object.
