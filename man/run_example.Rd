@@ -15,6 +15,9 @@ the low-dimensional embedding. Possible values of cluster are "real" or
 used. The implementation uses \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is not available
 on Windows.}
 }
+\value{
+None
+}
 \description{
 The current implementation contains one example on the MNIST data set. For
 each example, the tool can be launched visualizing the true class labels or

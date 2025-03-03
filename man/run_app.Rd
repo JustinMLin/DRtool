@@ -41,6 +41,9 @@ pulled from \code{Z}.}
 used. The implementation uses \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is not available
 on Windows.}
 }
+\value{
+None
+}
 \description{
 Launches the dimension reduction tool. The required inputs are the
 high-dimensional data matrix, the low-dimensional data matrix, and the clustering.

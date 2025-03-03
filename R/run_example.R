@@ -11,6 +11,8 @@
 #' used. The implementation uses [parallel::mclapply()], which is not available
 #' on Windows.
 #'
+#' @returns None
+#'
 #' @examples
 #' # parallel computing is not available on Windows
 #' run_example(cluster="real", parallel=TRUE)

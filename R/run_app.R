@@ -22,6 +22,8 @@
 #' used. The implementation uses [parallel::mclapply()], which is not available
 #' on Windows.
 #'
+#' @returns None
+#'
 #' @examples
 #' library(MASS)
 #' library(Rtsne)
