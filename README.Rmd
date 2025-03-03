@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-DRtool provides an interactive tool used to analyze clusterings of high-dimensional
+**DRtool** provides an interactive tool used to analyze clusterings of high-dimensional
 data. The minimum spanning tree is used in a manifold-learning process to approximate
 the high-dimensional data's distribution. Various analytical plots provide a
 multi-faceted perspective on the dimension reduction results to help distinguish
@@ -26,18 +26,22 @@ signal from byproducts of the dimension reduction process.
 
 ## Installation
 
-You can install the development version of DRtool from [GitHub](https://github.com/) with:
+**DRtool** is available on CRAN and can be installed with:
+```{r CRAN install, eval=FALSE}
+install.packages("DRtool")
+```
 
-``` r
-# install.packages("pak")
-pak::pak("JustinMLin/DRtool")
+The development version is available on [Github](https://github.com/JustinMLin/DRtool)
+and can be installed with:
+``` {r GitHub install, eval=FALSE}
+remotes::install_github("JustinMLin/DRtool")
 ```
 
 ## Example
 
-To run an example on the [MNIST](https://en.wikipedia.org/wiki/MNIST_database) data:
+To run an example on the [MNIST](https://en.wikipedia.org/wiki/MNIST_database) data set:
 
-```{r example}
+```{r example, eval=FALSE}
 library(DRtool)
 
 # parallel computing is not available on Windows
