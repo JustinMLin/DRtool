@@ -84,6 +84,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
   ui <- bslib::page_navbar(
     title="Dimension Reduction Tool",
     theme=bslib::bs_theme(bootswatch="cosmo"),
+    navbar_options = list(class="bg-primary", theme="dark"),
     fillable=FALSE,
     bslib::nav_panel(
       title="Default Clusters",
@@ -234,8 +235,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     mst_test_vals <- shiny::reactiveValues(sim_crossings=NULL, num_crossings=NULL, endpts=NULL)
 
     shortest_path <- shiny::reactive({
-      if(!isTruthy(input$from) | !(input$from %in% id)) return(NULL)
-      if(!isTruthy(input$to) | !(input$to %in% id)) return(NULL)
+      if(!shiny::isTruthy(input$from) | !(input$from %in% id)) return(NULL)
+      if(!shiny::isTruthy(input$to) | !(input$to %in% id)) return(NULL)
       if (input$from == input$to) return(NULL)
 
       get_shortest_path(tree, which(id == input$from), which(id == input$to))
