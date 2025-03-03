@@ -2,7 +2,7 @@ Package: DRtool
 Title: Dimension Reduction Assessment Tool
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Justin", "Lin", email = "linjus@iu.edu", role = c("aut", "cre"),
+    person("Justin", "Lin", email = "linjus@iu.edu", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0007-7190-2430")),
     person("Julia", "Fukuyama", email = "jfukuyam@iu.edu", role = "aut",
            comment = c(ORCID = "0000-0002-7590-5563")))
