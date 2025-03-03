@@ -352,8 +352,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     ###########################################################################
 
     shortest_path_brush <- shiny::reactive({
-      if(!isTruthy(input$from_brush) | !(input$from_brush %in% id)) return(NULL)
-      if(!isTruthy(input$to_brush) | !(input$to_brush %in% id)) return(NULL)
+      if(!shiny::isTruthy(input$from_brush) | !(input$from_brush %in% id)) return(NULL)
+      if(!shiny::isTruthy(input$to_brush) | !(input$to_brush %in% id)) return(NULL)
       if (input$from_brush == input$to_brush) return(NULL)
 
       get_shortest_path(tree, which(id == input$from_brush), which(id == input$to_brush))
