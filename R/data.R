@@ -1,4 +1,4 @@
-#' PCA-process MNIST data
+#' PCA-processed MNIST data
 #'
 #' MNIST data set pulled from the `dslabs` package. [prcomp()] used to compute a
 #' 300-dimensional PCA embedding, then 2,000 rows were randomly sampled.

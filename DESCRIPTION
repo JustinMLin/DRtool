@@ -40,3 +40,5 @@ Remotes:
     jokergoo/InteractiveComplexHeatmap
 LazyData: true
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.5.0)
