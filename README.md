@@ -26,7 +26,9 @@ The development version is available on
 with:
 
 ``` r
-remotes::install_github("JustinMLin/DRtool")
+# install.packages("devtools")
+
+devtools::install_github("JustinMLin/DRtool")
 ```
 
 ## Example
