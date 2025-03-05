@@ -46,24 +46,29 @@
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL, parallel=FALSE) {
-  if (all(class(Z) != "matrix") | all(class(X) != "matrix")) {
-    stop("Z and X must be matrices.")
+  if (all(class(Z) != "matrix") | all(class(X) != "matrix")) stop("Z and X must be matrices.")
+
+  if (nrow(Z) != nrow(X)) stop("Z and X must have an equal number of rows.")
+
+  if (length(cluster) != nrow(Z)) stop("The length of cluster must be equal to the number of rows of Z and X.")
+
+  if (!is.null(Z_dist)) {
+    if (any(class(Z_dist)) == "dist") {
+      if (attr(Z_dist, "Size") != nrow(Z)) stop("Z_dist must have a size of nrow(Z).")
+    }
+    else if (any(class(Z_dist) == "matrix")) {
+      if (nrow(Z_dist) != nrow(Z) || ncol(Z_dist) != nrow(Z)) stop("Z_dist must have a number of rows and columns equal to nrow(Z).")
+    }
+    else stop("Z_dist must be a matrix or dist object.")
   }
-  if (nrow(Z) != nrow(X)) {
-    stop("Z and X must have an equal number of rows.")
-  }
-  if (length(cluster) != nrow(Z)) {
-    stop("The length of cluster must be equal to the number of rows of Z and X.")
-  }
-  if (!is.null(id) && length(id) != nrow(Z)) {
-    stop("The length of id must be equal to the number of rows of Z and X.")
-  }
-  if (!is.null(col_names) && length(col_names) != ncol(Z)) {
-    stop("The length of col_names must be equal to the number of columns of Z.")
-  }
-  if (!is.null(meta_data) && nrow(meta_data) != nrow(Z)) {
-    stop("meta_data must have the same number of rows as Z.")
-  }
+
+  if (!is.null(id) && length(id) != nrow(Z)) stop("The length of id must be equal to the number of rows of Z and X.")
+
+  if (!is.null(col_names) && length(col_names) != ncol(Z)) stop("The length of col_names must be equal to the number of columns of Z.")
+
+  if (!is.null(meta_data) && nrow(meta_data) != nrow(Z)) stop("meta_data must have the same number of rows of Z and X.")
+
+  if (!(parallel %in% c(TRUE, FALSE))) stop("Parallel must be a Boolean.")
 
   col_names <- if(is.null(col_names)) colnames(Z) else col_names
   Z <- unname(Z)

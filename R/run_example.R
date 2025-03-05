@@ -18,7 +18,9 @@
 #' run_example(cluster="real", parallel=TRUE)
 #' @export
 run_example <- function(cluster=c("real", "kmeans"), parallel=FALSE) {
-  if (length(cluster > 1)) cluster <- cluster[1]
+  if (!(cluster %in% c("real", "kmeans"))) stop("Invalid cluster argument. Please see documentation.")
+
+  if (!(parallel %in% c(TRUE, FALSE))) stop("Parallel must be a Boolean.")
 
   col_names <- sapply(1:300, function(i) paste0("PC", i))
 
