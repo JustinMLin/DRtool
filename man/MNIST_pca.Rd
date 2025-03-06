@@ -3,7 +3,7 @@
 \docType{data}
 \name{MNIST_pca}
 \alias{MNIST_pca}
-\title{PCA-process MNIST data}
+\title{PCA-processed MNIST data}
 \format{
 An object of class \code{matrix} (inherits from \code{array}) with 2000 rows and 300 columns.
 }

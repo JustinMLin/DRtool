@@ -16,12 +16,12 @@ knitr::opts_chunk$set(
 
 This vignette provides an example of the DRtool workflow from start to finish,
 including preparing the data and using the tool. We will use the MNIST data set
-available in [dslabs](https://cran.r-project.org/web/packages/dslabs/index.html),
+available in [dslabs](https://cran.r-project.org/package=dslabs),
 as well as an implementation of UMAP available in
-[umap](https://cran.r-project.org/web/packages/umap/index.html). This package
+[umap](https://cran.r-project.org/package=umap). This package
 implements the UMAP algorithm in both R and Python. The Python implementation
 is more efficient, but requires a Python installation setup with
-[reticulate](https://cran.r-project.org/web/packages/reticulate/index.html) and
+[reticulate](https://cran.r-project.org/package=reticulate) and
 the Python package [umap-learn](https://umap-learn.readthedocs.io/en/latest/).
 
 ## Preparing the data
@@ -60,10 +60,10 @@ example of this process, but analysts should carefully consider how to construct
 a low-dimensional embedding of their own data.
 
 To create the low-dimensional embedding, we apply UMAP using the implementation
-in the R package [umap](https://cran.r-project.org/web/packages/umap/index.html).
+in the R package [umap](https://cran.r-project.org/package=umap).
 The Python implementation provided by the package is recommend for its
 efficiency, but it requires a Python installation setup with
-[reticulate](https://cran.r-project.org/web/packages/reticulate/index.html) and
+[reticulate](https://cran.r-project.org/package=reticulate) and
 the Python package [umap-learn](https://umap-learn.readthedocs.io/en/latest/).
 For ease of reproducibility, we resort to the provided R implementation.
 
