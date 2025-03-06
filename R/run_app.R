@@ -53,7 +53,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
   if (length(cluster) != nrow(Z)) stop("The length of cluster must be equal to the number of rows of Z and X.")
 
   if (!is.null(Z_dist)) {
-    if (any(class(Z_dist)) == "dist") {
+    if (any(class(Z_dist) == "dist")) {
       if (attr(Z_dist, "Size") != nrow(Z)) stop("Z_dist must have a size of nrow(Z).")
     }
     else if (any(class(Z_dist) == "matrix")) {
