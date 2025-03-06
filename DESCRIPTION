@@ -42,3 +42,5 @@ LazyData: true
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
+URL: https://github.com/JustinMLin/DRtool
+BugReports: https://github.com/JustinMLin/DRtool/issues
