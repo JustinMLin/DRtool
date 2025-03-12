@@ -4,11 +4,18 @@
 \alias{run_example}
 \title{Launch dimension reduction tool examples}
 \usage{
-run_example(cluster = c("real", "kmeans"), parallel = FALSE)
+run_example(
+  example = c("MNIST", "Wong"),
+  cluster = c("real", "kmeans"),
+  parallel = FALSE
+)
 }
 \arguments{
+\item{example}{A character string indicating which example data set to use.
+See \link{MNIST_pca} and \link{Wong_high}.}
+
 \item{cluster}{A character string indicating the clustering to project onto
-the low-dimensional embedding. Possible values of cluster are "real" or
+the low-dimensional embedding. Possible values of cluster are "real" and
 "kmeans".}
 
 \item{parallel}{A Boolean indicating whether parallel computing should be
@@ -25,5 +32,5 @@ a computed k-means clustering.
 }
 \examples{
 # parallel computing is not available on Windows
-run_example(cluster="real", parallel=TRUE)
+run_example(example="MNIST", cluster="real", parallel=TRUE)
 }

@@ -11,7 +11,7 @@ An object of class \code{matrix} (inherits from \code{array}) with 2000 rows and
 MNIST_pca
 }
 \description{
-MNIST data set pulled from the \code{dslabs} package. \code{\link[=prcomp]{prcomp()}} used to compute a
-300-dimensional PCA embedding, then 2,000 rows were randomly sampled.
+MNIST data set pulled from the \code{dslabs} package. \code{\link[=prcomp]{prcomp()}} was used to compute a
+300-dimensional PCA embedding, then 2,000 samples were randomly selected.
 }
 \keyword{datasets}

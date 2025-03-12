@@ -11,7 +11,7 @@ An object of class \code{integer} of length 2000.
 MNIST_labels
 }
 \description{
-A vector of MNIST class labels pulled from the \code{dslabs} package. The labels
+A vector of MNIST class labels pulled from the \code{dslabs} package for \link{MNIST_pca}. The labels
 correspond to the handwritten digits.
 }
 \keyword{datasets}

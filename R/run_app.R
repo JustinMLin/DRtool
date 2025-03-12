@@ -45,7 +45,7 @@
 #' run_app(Z, X, cluster, parallel=TRUE)
 #' @importFrom magrittr "%>%"
 #' @export
-run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=NULL, parallel=FALSE) {
+run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=colnames(Z), parallel=FALSE) {
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) stop("Z and X must be matrices.")
 
   if (nrow(Z) != nrow(X)) stop("Z and X must have an equal number of rows.")
@@ -70,7 +70,6 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
   if (!(parallel %in% c(TRUE, FALSE))) stop("Parallel must be a Boolean.")
 
-  col_names <- if(is.null(col_names)) colnames(Z) else col_names
   Z <- unname(Z)
   X <- unname(X)
 

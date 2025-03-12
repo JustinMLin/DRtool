@@ -11,7 +11,7 @@ An object of class \code{integer} of length 2000.
 MNIST_kmeans_cluster
 }
 \description{
-A vector of class labels computed using \code{\link[=kmeans]{kmeans()}} with 10 clusters, one for
+A vector of class labels computed using \code{\link[=kmeans]{kmeans()}} on \link{MNIST_pca} with 10 clusters, one for
 each digit.
 }
 \keyword{datasets}

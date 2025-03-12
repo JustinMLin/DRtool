@@ -11,7 +11,7 @@ run_app(
   Z_dist = dist(Z),
   id = NULL,
   meta_data = NULL,
-  col_names = NULL,
+  col_names = colnames(Z),
   parallel = FALSE
 )
 }
