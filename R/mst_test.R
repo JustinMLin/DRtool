@@ -70,12 +70,19 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   first_label <- cluster[path_ids[1]]
   last_label <- cluster[path_ids[length(path_ids)]]
 
-  Z1 <- Z[cluster %in% c(first_label, last_label),]
+  Z1 <- Z[cluster == first_label,]
+  Z2 <- Z[cluster == last_label,]
 
-  n <- dim(Z1)[1]
+  avg_dist <- max(mean(dist(Z1)), mean(dist(Z2)))
 
-  sd_ratio <- prcomp(Z1)$sdev
-  sd_ratio <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep]
+  p <- ncol(Z)
+
+  fp <- 1/sqrt(pi) * (gamma(p/2+1))^(1/p) * gamma(1+1/p)
+  lambda <- (fp/avg_dist)^p
+
+  Z_all <- rbind(Z1, Z2)
+  sd_ratio <- prcomp(Z_all)$sdev
+  side_lengths <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep] * sqrt(12)
 
   counts = vector(length=b)
 
@@ -83,9 +90,11 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      num_pts <- rpois(1, lambda*prod(side_lengths))
+
+      X <- matrix(nrow=num_pts, ncol=length(side_lengths))
+      for (j in 1:length(side_lengths)) {
+        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -105,9 +114,11 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      num_pts <- rpois(1, lambda*prod(side_lengths))
+
+      X <- matrix(nrow=num_pts, ncol=length(side_lengths))
+      for (j in 1:length(side_lengths)) {
+        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
