@@ -77,15 +77,17 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   sd_ratio <- prcomp(Z1)$sdev
   sd_ratio <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep]
 
+  side_lengths <- sd_ratio * sqrt(12)
+
   counts = vector(length=b)
 
   if (parallel) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(side_lengths))
+      for (j in 1:length(side_lengths)) {
+        X[,j] <- runif(n, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -105,9 +107,9 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      X <- matrix(nrow=n, ncol=length(side_lengths))
+      for (j in 1:length(side_lengths)) {
+        X[,j] <- runif(n, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
