@@ -40,5 +40,5 @@ To run an example on the
 library(DRtool)
 
 # parallel computing is not available on Windows
-run_example(cluster="real", parallel=TRUE)
+run_example(example="MNIST", cluster="real", parallel=TRUE)
 ```
