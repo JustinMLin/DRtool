@@ -7,7 +7,7 @@
 \usage{
 sim_crossings(Z, path, cluster, b, keep = 0.7, parallel = FALSE)
 
-sim_crossings_brush(Z, g1, g2, cluster, b, keep = 0.7, parallel = FALSE)
+sim_crossings_brush(Z, g1, g2, b, keep = 0.7, parallel = FALSE)
 }
 \arguments{
 \item{Z}{A numerical matrix containing the high-dimensional data.}
