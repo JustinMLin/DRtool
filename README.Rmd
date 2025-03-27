@@ -47,5 +47,5 @@ To run an example on the [MNIST](https://en.wikipedia.org/wiki/MNIST_database) d
 library(DRtool)
 
 # parallel computing is not available on Windows
-run_example(cluster="real", parallel=TRUE)
+run_example(example="MNIST", cluster="real", parallel=TRUE)
 ```

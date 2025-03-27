@@ -95,6 +95,8 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
     p <- res2$p
   }
 
+  side_lengths <- sd_ratio * sqrt(12)
+
   counts = vector(length=b)
 
   if (parallel) {
