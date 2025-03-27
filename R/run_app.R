@@ -505,7 +505,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         mst_test_vals_brush$g2 <- rv$g2
 
         if (length(intersect(mst_test_vals_brush$g1, mst_test_vals_brush$g2)) == 0) {
-          mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, cluster, input$num_sim_brush, parallel=parallel)
+          mst_test_vals_brush$sim_crossings <- sim_crossings_brush(Z, mst_test_vals_brush$g1, mst_test_vals_brush$g2, input$num_sim_brush, parallel=parallel)
           mst_test_vals_brush$num_crossings <- count_crossings_brush(tree, mst_test_vals_brush$g1, mst_test_vals_brush$g2)
         }
       }

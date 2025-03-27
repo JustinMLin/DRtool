@@ -29,13 +29,22 @@ count_crossings_brush <- function(mst, g1, g2) {
 }
 
 #' @rdname sim_crossings
-sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.7, parallel=FALSE) {
-  Z1 <- Z[c(g1, g2),]
+sim_crossings_brush <- function(Z, g1, g2, b, keep=0.7, parallel=FALSE) {
+  Z1 <- Z[g1,]
+  Z2 <- Z[g2,]
 
-  n <- dim(Z1)[1]
+  res1 <- get_log_density(Z1, keep)
+  res2 <- get_log_density(Z2, keep)
 
-  sd_ratio <- prcomp(Z1)$sdev
-  sd_ratio <- sd_ratio[cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep]
+  if (res1$log_density < res2$log_density) {
+    num_pts <- nrow(Z1)
+    side_lengths <- res1$sval * sqrt(12)
+    p <- res1$p
+  } else {
+    num_pts <- nrow(Z2)
+    side_lengths <- res2$sval * sqrt(12)
+    p <- res2$p
+  }
 
   counts = vector(length=b)
 
@@ -43,9 +52,9 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.7, parallel=FALSE)
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      X <- matrix(nrow=num_pts, ncol=p)
+      for (j in 1:p) {
+        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -65,9 +74,9 @@ sim_crossings_brush <- function(Z, g1, g2, cluster, b, keep=0.7, parallel=FALSE)
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=n, ncol=length(sd_ratio))
-      for (j in 1:length(sd_ratio)) {
-        X[,j] <- runif(n, min=-sd_ratio[j]/2, max=sd_ratio[j]/2)
+      X <- matrix(nrow=num_pts, ncol=p)
+      for (j in 1:p) {
+        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))

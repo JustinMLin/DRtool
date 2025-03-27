@@ -43,6 +43,15 @@ count_crossings <- function(mst, path, cluster) {
   count
 }
 
+get_log_density <- function(Z, keep) {
+  pca <- prcomp(Z)
+  p <- which(cumsum(pca$sdev^2/sum(pca$sdev^2)) >= keep)[1]
+
+  list(log_density = log(nrow(Z)) - sum(log(pca$sdev[1:p])),
+       sval = pca$sdev[1:p],
+       p=p)
+}
+
 #' Simulate the null distribution for number of crossings
 #'
 #' The MST is calculated on uniform sample drawn from a hyperrectangle. The
@@ -62,7 +71,7 @@ count_crossings <- function(mst, path, cluster) {
 #' @param g1,g2 A numerical vector of indices of the points in each group.
 #'
 #' @returns A numerical vector.
-sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
+sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   path_ids <- as.numeric(path$vpath)
 
   first_pt = path_ids[1]
@@ -73,28 +82,18 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
   Z1 <- Z[cluster == first_label,]
   Z2 <- Z[cluster == last_label,]
 
-  Z_all <- rbind(Z1, Z2)
-  pca <- prcomp(Z_all)
-  sd_ratio <- pca$sdev
+  res1 <- get_log_density(Z1, keep)
+  res2 <- get_log_density(Z2, keep)
 
-  keep_dims <- cumsum(sd_ratio^2)/sum(sd_ratio^2) < keep
-  sd_ratio <- sd_ratio[keep_dims]
-
-  side_lengths <- sd_ratio * sqrt(12)
-
-  X1 <- pca$x[1:nrow(Z1), keep_dims]
-  X2 <- pca$x[(nrow(Z_all) - nrow(Z2) + 1):nrow(Z_all), keep_dims]
-
-  X1_avg_nn <- mean(dbscan::kNN(X1, k=1)$dist)
-  X2_avg_nn <- mean(dbscan::kNN(X2, k=1)$dist)
-
-  avg_dist <- max(X1_avg_nn, X2_avg_nn)
-
-  p <- length(sd_ratio)
-
-  fp <- gamma(p/2+1)^(1/p) * gamma(1+1/p)/sqrt(pi)
-
-  lambda <- (fp/avg_dist)^p
+  if (res1$log_density < res2$log_density) {
+    num_pts <- nrow(Z1)
+    side_lengths <- res1$sval * sqrt(12)
+    p <- res1$p
+  } else {
+    num_pts <- nrow(Z2)
+    side_lengths <- res2$sval * sqrt(12)
+    p <- res2$p
+  }
 
   counts = vector(length=b)
 
@@ -102,8 +101,6 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      num_pts <- rpois(1, lambda*prod(side_lengths))
-
       X <- matrix(nrow=num_pts, ncol=p)
       for (j in 1:p) {
         X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
@@ -126,8 +123,6 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.9, parallel=FALSE) {
   }
   else {
     for (i in 1:b) {
-      num_pts <- rpois(1, lambda*prod(side_lengths))
-
       X <- matrix(nrow=num_pts, ncol=p)
       for (j in 1:p) {
         X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
