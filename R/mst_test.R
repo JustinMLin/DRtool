@@ -43,6 +43,25 @@ count_crossings <- function(mst, path, cluster) {
   count
 }
 
+#' Calculate the log density of a cluster
+#'
+#' The density of a cluster is estimated to be the volume of a hyperrectangle
+#' with side lengths equal to sqrt(12) times the singular values of the
+#' cluster. This is because a uniform distribution on the hyperrectangle will
+#' have variances equal to the variances of the cluster in the directions of the
+#' principal components.
+#'
+#' @param Z A numerical data matrix.
+#' @param keep A numeric between 0 and 1. The proportion of variance to retain
+#' when truncating dimensions.
+#'
+#' @returns A list with the following components:
+#' \item{log_density}{A numeric. The log density of the cluster.}
+#'
+#' \item{sval}{A numerical vector. The singular values retained after
+#' truncation}
+#'
+#' \item{p}{A numeric. The number of dimensions retained after truncation.}
 get_log_density <- function(Z, keep) {
   pca <- prcomp(Z)
   p <- which(cumsum(pca$sdev^2/sum(pca$sdev^2)) >= keep)[1]
@@ -94,8 +113,6 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
     side_lengths <- res2$sval * sqrt(12)
     p <- res2$p
   }
-
-  side_lengths <- sd_ratio * sqrt(12)
 
   counts = vector(length=b)
 
