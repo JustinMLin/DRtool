@@ -43,34 +43,6 @@ count_crossings <- function(mst, path, cluster) {
   count
 }
 
-#' Calculate the log density of a cluster
-#'
-#' The density of a cluster is estimated to be the volume of a hyperrectangle
-#' with side lengths equal to sqrt(12) times the singular values of the
-#' cluster. This is because a uniform distribution on the hyperrectangle will
-#' have variances equal to the variances of the cluster in the directions of the
-#' principal components.
-#'
-#' @param Z A numerical data matrix.
-#' @param keep A numeric between 0 and 1. The proportion of variance to retain
-#' when truncating dimensions.
-#'
-#' @returns A list with the following components:
-#' \item{log_density}{A numeric. The log density of the cluster.}
-#'
-#' \item{sval}{A numerical vector. The singular values retained after
-#' truncation}
-#'
-#' \item{p}{A numeric. The number of dimensions retained after truncation.}
-get_log_density <- function(Z, keep) {
-  pca <- prcomp(Z)
-  p <- which(cumsum(pca$sdev^2/sum(pca$sdev^2)) >= keep)[1]
-
-  list(log_density = log(nrow(Z)) - sum(log(pca$sdev[1:p])),
-       sval = pca$sdev[1:p],
-       p=p)
-}
-
 #' Simulate the null distribution for number of crossings
 #'
 #' The MST is calculated on uniform sample drawn from a hyperrectangle. The
@@ -119,18 +91,8 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
 #' used. The implementation uses [parallel::mclapply()], which is not available
 #' on Windows.
 sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
-  res1 <- get_log_density(Z1, keep)
-  res2 <- get_log_density(Z2, keep)
-
-  if (res1$log_density < res2$log_density) {
-    num_pts <- nrow(Z1)
-    side_lengths <- res1$sval * sqrt(12)
-    p <- res1$p
-  } else {
-    num_pts <- nrow(Z2)
-    side_lengths <- res2$sval * sqrt(12)
-    p <- res2$p
-  }
+  param <- get_sim_param(Z1, Z2, keep)
+  p <- length(param$side_lengths)
 
   counts = vector(length=b)
 
@@ -138,9 +100,9 @@ sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
-      X <- matrix(nrow=num_pts, ncol=p)
+      X <- matrix(nrow=param$num_pts, ncol=p)
       for (j in 1:p) {
-        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
+        X[,j] <- runif(param$num_pts, min=-param$side_lengths[j]/2, max=param$side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -160,9 +122,9 @@ sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
   }
   else {
     for (i in 1:b) {
-      X <- matrix(nrow=num_pts, ncol=p)
+      X <- matrix(nrow=param$num_pts, ncol=p)
       for (j in 1:p) {
-        X[,j] <- runif(num_pts, min=-side_lengths[j]/2, max=side_lengths[j]/2)
+        X[,j] <- runif(param$num_pts, min=-param$side_lengths[j]/2, max=param$side_lengths[j]/2)
       }
 
       mst <- get_mst(dist(X))
@@ -181,6 +143,48 @@ sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
 
   counts
 }
+
+
+#' Calculate the parameters for crossings simulation
+#'
+#' The density of a cluster is estimated to be the volume of a hyperrectangle
+#' with side lengths equal to sqrt(12) times the singular values of the
+#' cluster. This is because a uniform distribution on the hyperrectangle will
+#' have variances equal to the variances of the cluster in the directions of the
+#' principal components. The simulation parameters are chosen to match the
+#' group with the lower density.
+#'
+#' @param Z1 A numerical matrix containing the data for group 1.
+#' @param Z2 A numerical matrix containing the data for group 2.
+#' @param keep A numeric between 0 and 1. The proportion of variance to retain
+#' when truncating dimensions.
+#'
+#' @returns A list with the following components:
+#' \item{num_pts}{A numeric. The number of points to be sampled.}
+#'
+#' \item{side_lengths}{A numerical vector. The side lengths of the hyperrectangle
+#' to be sampled from.}
+get_sim_param <- function(Z1, Z2, keep) {
+  pca1 <- prcomp(Z1)
+  p1 <- which(cumsum(pca1$sdev^2/sum(pca1$sdev^2)) >= keep)[1]
+
+  pca2 <- prcomp(Z2)
+  p2 <- which(cumsum(pca2$sdev^2/sum(pca2$sdev^2)) >= keep)[1]
+
+  p <- max(p1, p2)
+
+  log_density1 <- log(nrow(Z1)) - sum(log(pca1$sdev[1:p]))
+  log_density2 <- log(nrow(Z2)) - sum(log(pca2$sdev[1:p]))
+
+  if (log_density1 <= log_density2) {
+    list(num_pts = nrow(Z1),
+         side_lengths = pca1$sdev[1:p] * sqrt(12))
+  } else {
+    list(num_pts = nrow(Z2),
+         side_lengths = pca2$sdev[1:p] * sqrt(12))
+  }
+}
+
 
 #' Retrieves the id's of the path endpoints.
 #'
