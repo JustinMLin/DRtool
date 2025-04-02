@@ -44,6 +44,11 @@
 #' A vector of cell type labels for [Wong_high].
 "Wong_cell_labels"
 
+#' Wong tissue type labels
+#'
+#' A vector of tissue type labels for [Wong_high].
+"Wong_organ_labels"
+
 #' Output of k-means clustering on Wong et al. (2016) data
 #'
 #' A vector of class labels computed using [kmeans()] with 10 clusters on [Wong_high].
