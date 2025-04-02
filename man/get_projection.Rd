@@ -3,7 +3,7 @@
 \name{get_projection}
 \alias{get_projection}
 \alias{get_projection_brush}
-\title{Compute the projection of the selected points using the PCA/rCCA method}
+\title{Calculate the projection of the selected points using the PCA-rCCA method}
 \usage{
 get_projection(Z, path, cluster, dim, degree)
 

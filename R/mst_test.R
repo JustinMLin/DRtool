@@ -101,6 +101,24 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   Z1 <- Z[cluster == first_label,]
   Z2 <- Z[cluster == last_label,]
 
+  sim_crossings_inner(Z1, Z2, b, keep, parallel)
+}
+
+#' Internal function for [sim_crossings()] and [sim_crossings_brush()]
+#'
+#' Internal function used by [sim_crossings()] and [sim_crossings_brush()] to
+#' simulate the null distribution of crossings once and the two groups are
+#' specified.
+#'
+#' @param Z1 A numerical matrix containing the data for group 1.
+#' @param Z2 A numerical matrix containing the data for group 2.
+#' @param b A positive numeric. The number of simulations to run.
+#' @param keep A numeric between 0 and 1. The proportion of variance to retain
+#' when truncating dimensions.
+#' @param parallel A Boolean indicating whether parallel computing should be
+#' used. The implementation uses [parallel::mclapply()], which is not available
+#' on Windows.
+sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
   res1 <- get_log_density(Z1, keep)
   res2 <- get_log_density(Z2, keep)
 

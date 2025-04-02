@@ -1,4 +1,4 @@
-#' Compute the projection of the selected points using the PCA/rCCA method
+#' Calculate the projection of the selected points using the PCA-rCCA method
 #'
 #' @description
 #' The selected points are first projected down to `dim` dimensions using PCA.
@@ -35,6 +35,37 @@ get_projection <- function(Z, path, cluster, dim, degree) {
   last_label <- cluster[path_ids[length(path_ids)]]
 
   ids <- unique(c(path_ids, which(cluster == first_label), which(cluster == last_label)))
+
+  get_projection_inner(Z, path, dim, degree, path_ids, path_pts, ids)
+}
+
+#' Internal function for [get_projection()] and [get_projection_brush()]
+#'
+#' Internal function used by [get_projection()] and [get_projection_brush()] to
+#' calculate the PCA-rCCA projection.
+#'
+#' @param Z A numerical matrix containing the high-dimensional data.
+#' @param path A named list returned by [get_shortest_path()].
+#' @param dim A numeric greater than or equal to 2.
+#' @param degree A positive numeric.
+#' @param path_ids A numerical vector containing the indices of the points along
+#' the path.
+#' @param path_pts A numeric matrix containing the coordinates of the points
+#' along the path.
+#' @param ids A numerical vector containing the indices of the points to
+#' project.
+#'
+#' @returns A list with the following components:
+#' \item{projected_pts}{A numerical matrix with two columns containing the
+#' projected coordinates.}
+#'
+#' \item{ids}{A numerical vector containing the indices of the selected points.}
+#'
+#' \item{path_ids}{A numerical vector containing the indices of the path points.}
+#'
+#' \item{var_explained}{A numeric. The proportion of variance retained during
+#' the PCA projection step.}
+get_projection_inner <- function(Z, path, dim, degree, path_ids, path_pts, ids) {
   pts <- Z[ids,]
 
   pca <- prcomp(pts, rank.=dim)
