@@ -31,7 +31,7 @@ run_example <- function(example=c("MNIST", "Wong"), cluster=c("real", "kmeans"),
     else if (cluster == "kmeans") run_app(MNIST_pca, MNIST_low, MNIST_kmeans_cluster, id=MNIST_id, col_names=col_names, parallel=parallel)
   }
   else if (example == "Wong") {
-    if (cluster == "real") run_app(Wong_high, Wong_low, Wong_organ_labels, parallel=parallel)
-    else if (cluster == "kmeans") run_app(Wong_high, Wong_low, Wong_kmeans, parallel=parallel)
+    if (cluster == "real") run_app(Wong_high, Wong_low, Wong_organ_labels, meta_data=data.frame(Wong_cell_labels), parallel=parallel)
+    else if (cluster == "kmeans") run_app(Wong_high, Wong_low, Wong_kmeans, meta_data=data.frame(Wong_cell_labels), parallel=parallel)
   }
 }
