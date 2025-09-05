@@ -12,7 +12,7 @@ Wong_high
 }
 \description{
 Mass cytometry data from \href{https://doi.org/10.1016/j.immuni.2016.07.007}{Wong et al. (2016)}.
-The data was processed according to \href{https://rdcu.be/edjyF}{Becht et al. (2018)},
+The data was processed according to \href{https://www.nature.com/articles/doi:10.1038/nbt.4314.epdf?sharing_token=G7k__zflxFlYhRLIRySpAtRgN0jAjWel9jnR3ZoTv0NFmV-pW0O8ddmuAfWKT7uTCry4tCzWyL3Wzdfnz5B_0wyyWhwrSsy-9fWd7f0j5VlMUrbzKpcqFWIoL27QL8fWgCGw_KLJuImgYWttt7L_PQ\%3D\%3D}{Becht et al. (2018)},
 then 3,000 samples were randomly selected.
 }
 \keyword{datasets}
