@@ -17,7 +17,10 @@
 #'
 #' @examples
 #' # parallel computing is not available on Windows
-#' run_example(example="MNIST", cluster="real", parallel=TRUE)
+#' if (interactive()) {
+#'   run_example(example="MNIST", cluster="real", parallel=FALSE)
+#' }
+#'
 #' @export
 run_example <- function(example=c("MNIST", "Wong"), cluster=c("real", "kmeans"), parallel=FALSE) {
   if (!(example %in% c("MNIST", "Wong"))) stop("Invalid example argument. Please see documentation.")

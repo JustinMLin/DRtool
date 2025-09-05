@@ -32,5 +32,8 @@ a computed k-means clustering.
 }
 \examples{
 # parallel computing is not available on Windows
-run_example(example="MNIST", cluster="real", parallel=TRUE)
+if (interactive()) {
+  run_example(example="MNIST", cluster="real", parallel=FALSE)
+}
+
 }

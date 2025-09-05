@@ -67,5 +67,8 @@ cluster <- kmeans(Z, centers=3, nstart=10)$cluster
 
 # launch tool
 # parallel computing is not available on Windows
-run_app(Z, X, cluster, parallel=TRUE)
+if (interactive()) {
+  run_app(Z, X, cluster, parallel=FALSE)
+}
+
 }

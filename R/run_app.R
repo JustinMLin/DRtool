@@ -42,7 +42,10 @@
 #'
 #' # launch tool
 #' # parallel computing is not available on Windows
-#' run_app(Z, X, cluster, parallel=TRUE)
+#' if (interactive()) {
+#'   run_app(Z, X, cluster, parallel=FALSE)
+#' }
+#'
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=colnames(Z), parallel=FALSE) {
