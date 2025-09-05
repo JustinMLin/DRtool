@@ -15,13 +15,7 @@ signal from byproducts of the dimension reduction process.
 
 ## Installation
 
-**DRtool** is available on CRAN and can be installed with:
-
-``` r
-install.packages("DRtool")
-```
-
-The development version is available on
+**DRtool** is available at
 [Github](https://github.com/JustinMLin/DRtool) and can be installed
 with:
 
