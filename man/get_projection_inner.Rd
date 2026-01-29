@@ -38,5 +38,5 @@ the PCA projection step.}
 }
 \description{
 Internal function used by \code{\link[=get_projection]{get_projection()}} and \code{\link[=get_projection_brush]{get_projection_brush()}} to
-calculate the PCA-rCCA projection.
+calculate the PCA-RCCA projection.
 }

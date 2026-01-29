@@ -49,6 +49,7 @@
 #' @importFrom magrittr "%>%"
 #' @export
 run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_names=colnames(Z), parallel=FALSE) {
+  # Check inputs
   if (all(class(Z) != "matrix") | all(class(X) != "matrix")) stop("Z and X must be matrices.")
 
   if (nrow(Z) != nrow(X)) stop("Z and X must have an equal number of rows.")
@@ -80,12 +81,16 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
   max_length <- max(igraph::E(tree)$weight)
 
+  # Create base layer of 2D embedding
   plotting_df <- data.frame(x=X[,1], y=X[,2], cluster, id, row=1:nrow(X))
   p <- ggplot2::ggplot(plotting_df, ggplot2::aes(x=x, y=y, color=factor(cluster), label=id, key=row)) +
     ggplot2::geom_point(size=0.3) +
     ggplot2::labs(color="Class")
+
+  # Calculate medoid MST
   medoid_p = plot_medoid_mst(p, plotting_df, Z_dist, tree)
 
+  # Setup interface
   ui <- bslib::page_navbar(
     title="Dimension Reduction Tool",
     theme=bslib::bs_theme(bootswatch="cosmo"),
@@ -237,6 +242,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
 
   server <- function(input, output, session) {
 
+    # Non-custom groupings page
+
     mst_test_vals <- shiny::reactiveValues(sim_crossings=NULL, num_crossings=NULL, endpts=NULL)
 
     shortest_path <- shiny::reactive({
@@ -308,6 +315,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         plotly::layout(showlegend = FALSE)
     })
 
+    # Only compute MST hypothesis test when button is pressed
     shiny::observeEvent(input$bootstrap, {
       if (is.null(shortest_path())) {
         mst_test_vals$sim_crossings <- NULL
@@ -354,6 +362,8 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
     })
 
     ###########################################################################
+
+    # Custom groupings page
 
     shortest_path_brush <- shiny::reactive({
       if(!shiny::isTruthy(input$from_brush) | !(input$from_brush %in% id)) return(NULL)
@@ -495,6 +505,7 @@ run_app <- function(Z, X, cluster, Z_dist=dist(Z), id=NULL, meta_data=NULL, col_
         {if (input$path_color_brush == "Original Coloring") plotly::layout(., showlegend = FALSE) else .}
     })
 
+    # Only compute MST hypothesis test when button is pressed
     shiny::observeEvent(input$bootstrap_brush, {
       if (is.null(rv$g1) | is.null(rv$g2)) {
         mst_test_vals_brush$g1 <- NULL

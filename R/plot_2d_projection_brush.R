@@ -1,6 +1,7 @@
 #' @rdname plot_2d_projection
 #' @importFrom magrittr "%>%"
 plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges, color_choice) {
+  # Get colors of points based on selected option
   if (color_choice == "Original Coloring") {
     cols <- cluster[sort(ids)]
   }
@@ -32,6 +33,7 @@ plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, id
 
   for (i in 1:num_edges) {
     index_in_path_ids <- match(igraph::V(plotting_graph)$name[edge_mat[i,]], path_ids)
+    # Set color of path segments
     if (!any(is.na(index_in_path_ids))) {
       if (min(index_in_path_ids) == slider) {
         path_color[i] <- 2
@@ -61,11 +63,14 @@ plot_2d_projection_brush <- function(mst, cluster, id, g1, g2, projected_pts, id
 
   p <- ggplot2::ggplot(df) +
     suppressWarnings(ggnetwork::geom_nodes(ggplot2::aes(x=x, y=y, fill=color, label=id), size=0.8, color="transparent", shape=21)) +
+    # Color according to clustering
     {if (color_choice == "Original Coloring") ggplot2::scale_fill_manual(values=scales::hue_pal()(length(unique(cluster)))[sort(match(unique(df$color), sort(unique(cluster))))])} +
+    # Color according to selected groups
     {if (color_choice == "Group Coloring") ggplot2::scale_fill_manual(values=c("black", "#F8766D", "#00BFC4", "#C77CFF"), drop=FALSE)} +
     ggnetwork::geom_edges(data=df[df$edge_type == "path",],
                           ggplot2::aes(x=x, y=y, xend=xend, yend=yend, color=path_color), linewidth=0.3) +
     ggplot2::scale_color_manual(values=c("black", "red")) +
+    # Show all non-path edges as well
     {if (show_all_edges == "Show") ggnetwork::geom_edges(data=df[df$edge_type == "non-path",],
                                                          ggplot2::aes(x=x, y=y, xend=xend, yend=yend), linewidth=0.3, alpha=0.2)} +
     {if (adjust != 0) ggplot2::geom_density2d(data=df_points, ggplot2::aes(x=x, y=y), adjust=adjust, alpha=.5)} +

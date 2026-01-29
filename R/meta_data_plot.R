@@ -13,6 +13,7 @@
 #'
 #' @returns A `ggplot` or `gtable` object.
 meta_data_plot <- function(Z, path, cluster, meta_data, feature) {
+  # Get points that belong to the same cluster as one of the endpoints
   path_ids <- as.numeric(path$vpath)
   path_pts <- Z[path_ids,]
 
@@ -25,11 +26,13 @@ meta_data_plot <- function(Z, path, cluster, meta_data, feature) {
   df <- data.frame(data = meta_data[[feature]][c(ids1,ids2)],
                    group = factor(rep(c(1,2), times=c(length(ids1), length(ids2)))))
 
+  # Use boxplot if data is numerical
   if (is.numeric(meta_data[[feature]])) {
     ggplot2::ggplot(df, ggplot2::aes(x=group, y=data, color=group)) +
       ggplot2::geom_boxplot() +
       ggplot2::labs(color = feature)
   }
+  # Use pie chart otherwise
   else {
     p1 <- ggplot2::ggplot(df[df$group == 1,], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +

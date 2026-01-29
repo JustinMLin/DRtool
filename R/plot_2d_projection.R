@@ -36,7 +36,7 @@
 #' added after the plot is converted into a `plotly` object.
 #' @importFrom magrittr "%>%"
 plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, var_explained, degree, slider, adjust, show_all_edges) {
-  #induced_subgraph re-orders vertices by vids, low to high
+  # igraph::induced_subgraph() re-orders vertices by vids, low to high
   plotting_graph <- igraph::induced_subgraph(mst, vids=ids) %>%
     igraph::set_vertex_attr("color", value=factor(cluster[sort(ids)])) %>%
     igraph::set_vertex_attr("id", value=id[sort(ids)])
@@ -48,6 +48,8 @@ plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, v
 
   for (i in 1:num_edges) {
     index_in_path_ids <- match(igraph::V(plotting_graph)$name[edge_mat[i,]], path_ids)
+
+    # Set color of path segments
     if (!any(is.na(index_in_path_ids))) {
       if (min(index_in_path_ids) == slider) {
         path_color[i] <- 2
@@ -65,7 +67,7 @@ plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, v
   df <- ggnetwork::ggnetwork(plotting_graph, layout=projected_pts[order(ids),1:2])
 
   #ggnetwork overlays multiple nodes so density must be constructed from projected_pts
-  #ggnetwork scales data fit in [0,1] x [0,1]
+  #ggnetwork scales data to fit in [0,1] x [0,1]
   m_hor = (max(projected_pts[,1]) - min(projected_pts[,1]))^{-1}
   b_hor = min(projected_pts[,1]) * -m_hor
 
@@ -81,6 +83,7 @@ plot_2d_projection <- function(mst, cluster, id, projected_pts, ids, path_ids, v
     ggnetwork::geom_edges(data=df[df$edge_type == "path",],
                           ggplot2::aes(x=x, y=y, xend=xend, yend=yend, color=path_color), linewidth=0.3) +
     ggplot2::scale_color_manual(values=c("black", "red")) +
+    # Show all non-path edges as well
     {if (show_all_edges == "Show") ggnetwork::geom_edges(data=df[df$edge_type == "non-path",],
                                                          ggplot2::aes(x=x, y=y, xend=xend, yend=yend), linewidth=0.3, alpha=0.2)} +
     {if (adjust != 0) ggplot2::geom_density2d(data=df_points, ggplot2::aes(x=x, y=y), adjust=adjust, alpha=.5)} +

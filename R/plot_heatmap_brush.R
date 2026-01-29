@@ -14,6 +14,7 @@ plot_heatmap_brush <- function(Z, g1, g2, col_names) {
   ddr <- as.dendrogram(hcr)
 
   if (length(just_g1) > 0 & length(just_g2) > 0) {
+    # Order features based on average between two groups
     ddr <- reorder(ddr, colMeans(Z[just_g1,]) - colMeans(Z[just_g2,]))
   }
 

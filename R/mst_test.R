@@ -73,6 +73,7 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
   Z1 <- Z[cluster == first_label,]
   Z2 <- Z[cluster == last_label,]
 
+  # Use inner function for both sim_crossings() and sim_crossings_brush()
   sim_crossings_inner(Z1, Z2, b, keep, parallel)
 }
 
@@ -91,22 +92,27 @@ sim_crossings <- function(Z, path, cluster, b, keep=0.7, parallel=FALSE) {
 #' used. The implementation uses [parallel::mclapply()], which is not available
 #' on Windows.
 sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
+  # param = list(num_pts, side_lengths)
   param <- get_sim_param(Z1, Z2, keep)
   p <- length(param$side_lengths)
 
   counts = vector(length=b)
 
+  # Parallel computing only available with parallel package on Mac
   if (parallel) {
     num_cores <- parallel::detectCores()
 
     counts <- parallel::mclapply(1:b, function(i) {
+      # Sample uniformly from hyperrectangle
       X <- matrix(nrow=param$num_pts, ncol=p)
       for (j in 1:p) {
         X[,j] <- runif(param$num_pts, min=-param$side_lengths[j]/2, max=param$side_lengths[j]/2)
       }
 
+      # Calculate MST
       mst <- get_mst(dist(X))
 
+      # Count number of edges crossing x1 = 0 hyperplane
       count <- 0
       for (k in 1:igraph::ecount(mst)) {
         head <- X[igraph::head_of(mst, k),]
@@ -122,13 +128,16 @@ sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
   }
   else {
     for (i in 1:b) {
+      # Sample uniformly from hyperrectangle
       X <- matrix(nrow=param$num_pts, ncol=p)
       for (j in 1:p) {
         X[,j] <- runif(param$num_pts, min=-param$side_lengths[j]/2, max=param$side_lengths[j]/2)
       }
 
+      # Calculate MST
       mst <- get_mst(dist(X))
 
+      # Count number of edges crossing x1 = 0 hyperplane
       count <- 0
       for (k in 1:igraph::ecount(mst)) {
         head <- X[igraph::head_of(mst, k),]
@@ -165,6 +174,7 @@ sim_crossings_inner <- function(Z1, Z2, b, keep, parallel) {
 #' \item{side_lengths}{A numerical vector. The side lengths of the hyperrectangle
 #' to be sampled from.}
 get_sim_param <- function(Z1, Z2, keep) {
+  # Keep minimal number of dimensions so that both Z1 and Z2 retain enough variance
   pca1 <- prcomp(Z1)
   p1 <- which(cumsum(pca1$sdev^2/sum(pca1$sdev^2)) >= keep)[1]
 
@@ -173,9 +183,11 @@ get_sim_param <- function(Z1, Z2, keep) {
 
   p <- max(p1, p2)
 
+  # Convert to log
   log_density1 <- log(nrow(Z1)) - sum(log(pca1$sdev[1:p]))
   log_density2 <- log(nrow(Z2)) - sum(log(pca2$sdev[1:p]))
 
+  # Side lengths according to data set with minimal density
   if (log_density1 <= log_density2) {
     list(num_pts = nrow(Z1),
          side_lengths = pca1$sdev[1:p] * sqrt(12))

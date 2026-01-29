@@ -35,6 +35,7 @@ plot_heatmap <- function(Z, path, cluster, col_names) {
   ddr <- as.dendrogram(hcr)
 
   if (first_label != last_label) {
+    # Order features based on average between two groups
     ddr <- reorder(ddr, colMeans(Z[first_ids,]) - colMeans(Z[last_ids,]))
   }
 

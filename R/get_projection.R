@@ -36,13 +36,14 @@ get_projection <- function(Z, path, cluster, dim, degree) {
 
   ids <- unique(c(path_ids, which(cluster == first_label), which(cluster == last_label)))
 
+  # Create inner function for get_projection() and get_projection_brush()
   get_projection_inner(Z, path, dim, degree, path_ids, path_pts, ids)
 }
 
 #' Internal function for [get_projection()] and [get_projection_brush()]
 #'
 #' Internal function used by [get_projection()] and [get_projection_brush()] to
-#' calculate the PCA-rCCA projection.
+#' calculate the PCA-RCCA projection.
 #'
 #' @param Z A numerical matrix containing the high-dimensional data.
 #' @param path A named list returned by [get_shortest_path()].
@@ -68,10 +69,12 @@ get_projection <- function(Z, path, cluster, dim, degree) {
 get_projection_inner <- function(Z, path, dim, degree, path_ids, path_pts, ids) {
   pts <- Z[ids,]
 
+  # Preliminary PCA step
   pca <- prcomp(pts, rank.=dim)
   X <- predict(pca, pts)
   var_explained <- sum(pca$sdev[1:dim]^2)/sum(pca$sdev^2)
 
+  # Buiild polynomial design matrix
   ref_mat <- matrix(nrow=length(path$vpath), ncol=degree)
   for (i in 1:degree) {
     ref_mat[,i] <- (1:length(path$vpath))^i
@@ -81,9 +84,13 @@ get_projection_inner <- function(Z, path, dim, degree, path_ids, path_pts, ids) 
     proj_pca = prcomp(path_pts, rank.=2)
     projected_pts = predict(proj_pca, pts)
   } else {
+    # Use grid search to calibrate regularization constant
     invisible(capture.output(lambda <- CCA::estim.regul(X[1:length(path_ids),], ref_mat,
                                                         grid1=10^(-3:2), plt=FALSE)$lambda1))
+    # Calculate transformation
     cc1 <- CCA::rcc(X[1:length(path_ids),], ref_mat, lambda, 0)
+
+    # Transform data
     projected_pts = X %*% cc1$xcoef
   }
 

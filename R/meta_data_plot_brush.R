@@ -1,5 +1,6 @@
 #' @rdname meta_data_plot
 meta_data_plot_brush <- function(Z, g1, g2, meta_data, feature) {
+  # Get points that belong to either or both of the selected groups
   both_groups <- intersect(g1, g2)
   just_g1 <- g1[!(g1 %in% g2)]
   just_g2 <- g2[!(g2 %in% g1)]
@@ -10,12 +11,13 @@ meta_data_plot_brush <- function(Z, g1, g2, meta_data, feature) {
                                                                                length(just_g2))),
                                   levels=c("Group 1", "Both Groups", "Group 2")))
 
-
+  # Use boxplot if data is numerical
   if (is.numeric(meta_data[[feature]])) {
     ggplot2::ggplot(df, ggplot2::aes(x=group, y=data, color=group)) +
       ggplot2::geom_boxplot() +
       ggplot2::labs(color = feature)
   }
+  # Use pie chart otherwise
   else {
     p1 <- ggplot2::ggplot(df[df$group == "Group 1",], ggplot2::aes(x=factor(1), fill=data)) +
       ggplot2::geom_bar(stat="count", width=1, color="white") +
